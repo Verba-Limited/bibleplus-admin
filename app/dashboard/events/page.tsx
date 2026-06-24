@@ -29,7 +29,10 @@ const views: { id: EventView; label: string }[] = [
 function toEventList(value: unknown): BibleplusEvent[] {
   if (Array.isArray(value)) return value as BibleplusEvent[];
   if (value && typeof value === "object") {
-    const data = value as { events?: BibleplusEvent[]; results?: BibleplusEvent[] };
+    const data = value as {
+      events?: BibleplusEvent[];
+      results?: BibleplusEvent[];
+    };
     return data.events || data.results || [];
   }
   return [];
@@ -52,6 +55,16 @@ function getLiveStreamUrl(event: BibleplusEvent) {
   );
 }
 
+function getRequestErrorMessage(error: unknown, fallback: string) {
+  if (typeof error === "object" && error && "response" in error) {
+    const response = (error as { response?: { data?: { message?: string } } })
+      .response;
+    return response?.data?.message || fallback;
+  }
+
+  return fallback;
+}
+
 function formatDate(value?: string) {
   if (!value) return "No date";
   const date = new Date(value);
@@ -64,6 +77,22 @@ function formatDate(value?: string) {
     hour: "numeric",
     minute: "2-digit",
   }).format(date);
+}
+
+function toDateTimeLocal(value?: string) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate(),
+  )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function fromDateTimeLocal(value: string) {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toISOString();
 }
 
 export default function EventsPage() {
@@ -112,7 +141,7 @@ export default function EventsPage() {
 
   const selectedEvent = useMemo(
     () => events.find((event) => event._id === selectedId) || null,
-    [events, selectedId]
+    [events, selectedId],
   );
 
   const loadEvents = async (view = activeView) => {
@@ -135,7 +164,9 @@ export default function EventsPage() {
       setSelectedId((current) => current || nextEvents[0]?._id || "");
     } catch (err) {
       console.error(err);
-      setError("Could not load events. Confirm the endpoint path and admin token.");
+      setError(
+        "Could not load events. Confirm the endpoint path and admin token.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -145,13 +176,30 @@ export default function EventsPage() {
     loadEvents("all");
   }, []);
 
+  // useEffect(() => {
+  //   if (!selectedEvent) return;
+
+  //   setForm({
+  //     title: getEventTitle(selectedEvent),
+  //     startDate: selectedEvent.startDate || getEventDate(selectedEvent),
+  //     endDate: selectedEvent.endDate || "",
+  //     location: selectedEvent.location || "",
+  //     status: selectedEvent.status || "",
+  //     description: selectedEvent.description || "",
+  //     liveStreamPlatform: selectedEvent.liveStream?.platform || "",
+  //     liveStreamUrl: getLiveStreamUrl(selectedEvent),
+  //     liveStreamThumbnail: selectedEvent.liveStream?.thumbnail || "",
+  //   });
+  // }, [selectedEvent]);
   useEffect(() => {
     if (!selectedEvent) return;
 
     setForm({
       title: getEventTitle(selectedEvent),
-      startDate: selectedEvent.startDate || getEventDate(selectedEvent),
-      endDate: selectedEvent.endDate || "",
+      startDate: toDateTimeLocal(
+        selectedEvent.startDate || getEventDate(selectedEvent),
+      ),
+      endDate: toDateTimeLocal(selectedEvent.endDate || ""),
       location: selectedEvent.location || "",
       status: selectedEvent.status || "",
       description: selectedEvent.description || "",
@@ -164,10 +212,10 @@ export default function EventsPage() {
   const buildEventPayload = (values: typeof createForm): EventPayload => ({
     title: values.title,
     description: values.description,
-    startDate: values.startDate,
-    endDate: values.endDate,
+    startDate: fromDateTimeLocal(values.startDate),
+    endDate: fromDateTimeLocal(values.endDate),
     location: values.location,
-    coverImage: values.coverImage,
+    coverImage: values.coverImage || bannerUrl,
     category: values.category,
     isOnline: values.isOnline || Boolean(values.liveStreamUrl),
     liveStream: {
@@ -179,15 +227,28 @@ export default function EventsPage() {
 
   const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const coverImage = createForm.coverImage || bannerUrl;
+
+    if (bannerFile && !coverImage) {
+      setError("Upload the selected banner first, then create the event.");
+      return;
+    }
+
     setIsSaving(true);
     setError("");
     setSuccess("");
 
     try {
-      const response = await eventsApi.create(buildEventPayload(createForm));
+      const payload = buildEventPayload({ ...createForm, coverImage });
+      const response = await eventsApi.create(payload);
       if (response.data?._id) {
         setEvents((current) => [response.data as BibleplusEvent, ...current]);
         setSelectedId(response.data._id);
+      }
+      if (!response.data?.coverImage && coverImage) {
+        setError(
+          "Event was created, but the backend returned an empty coverImage. The create event endpoint may not be saving coverImage yet.",
+        );
       }
       setSuccess(response.message || "Event created successfully.");
       setCreateForm({
@@ -205,7 +266,9 @@ export default function EventsPage() {
       });
     } catch (err) {
       console.error(err);
-      setError("Event creation failed. Confirm POST /admin/events and the payload shape.");
+      setError(
+        "Event creation failed. Confirm POST /admin/events and the payload shape.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -222,10 +285,15 @@ export default function EventsPage() {
       const response = await eventsApi.uploadBanner(bannerFile);
       setBannerUrl(response.url);
       setCreateForm((current) => ({ ...current, coverImage: response.url }));
-      setSuccess("Banner uploaded successfully.");
+      setSuccess("Banner uploaded and added to the Cover image URL field.");
     } catch (err) {
       console.error(err);
-      setError("Banner upload failed. Please choose an image and try again.");
+      setError(
+        getRequestErrorMessage(
+          err,
+          "Banner upload failed. Please choose an image and try again.",
+        ),
+      );
     } finally {
       setIsUploadingBanner(false);
     }
@@ -242,10 +310,17 @@ export default function EventsPage() {
       const response = await eventsApi.uploadGallery(galleryFiles);
       const urls = response.images.map((image) => image.url);
       setGalleryUrls(urls);
-      setSuccess(`${urls.length} gallery image${urls.length === 1 ? "" : "s"} uploaded successfully.`);
+      setSuccess(
+        `${urls.length} gallery image${urls.length === 1 ? "" : "s"} uploaded successfully.`,
+      );
     } catch (err) {
       console.error(err);
-      setError("Gallery upload failed. Confirm POST /admin/events/gallery/upload and form-data key images.");
+      setError(
+        getRequestErrorMessage(
+          err,
+          "Gallery upload failed. Please choose one or more images and try again.",
+        ),
+      );
     } finally {
       setIsUploadingBanner(false);
     }
@@ -273,7 +348,9 @@ export default function EventsPage() {
       setCategoryName("");
     } catch (err) {
       console.error(err);
-      setError("Category creation failed. Confirm POST /admin/event-categories.");
+      setError(
+        "Category creation failed. Confirm POST /admin/event-categories.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -330,8 +407,8 @@ export default function EventsPage() {
     try {
       const payload = {
         title: form.title,
-        startDate: form.startDate,
-        endDate: form.endDate,
+        startDate: fromDateTimeLocal(form.startDate),
+        endDate: fromDateTimeLocal(form.endDate),
         location: form.location,
         status: form.status,
         description: form.description,
@@ -346,7 +423,9 @@ export default function EventsPage() {
       await loadEvents(activeView);
     } catch (err) {
       console.error(err);
-      setError("Event update failed. The backend may expect different field names.");
+      setError(
+        "Event update failed. The backend may expect different field names.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -377,7 +456,9 @@ export default function EventsPage() {
       setSuccess(response.message || "Livestream updated successfully.");
     } catch (err) {
       console.error(err);
-      setError("Livestream update failed. Confirm PUT /admin/events/:id/live and the selected event ID.");
+      setError(
+        "Livestream update failed. Confirm PUT /admin/events/:id/live and the selected event ID.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -387,7 +468,7 @@ export default function EventsPage() {
     if (!selectedId) return;
 
     const confirmed = window.confirm(
-      `Delete "${selectedEvent ? getEventTitle(selectedEvent) : selectedId}"? This cannot be undone.`
+      `Delete "${selectedEvent ? getEventTitle(selectedEvent) : selectedId}"? This cannot be undone.`,
     );
     if (!confirmed) return;
 
@@ -397,12 +478,16 @@ export default function EventsPage() {
 
     try {
       const response = await eventsApi.delete(selectedId);
-      setEvents((current) => current.filter((event) => event._id !== selectedId));
+      setEvents((current) =>
+        current.filter((event) => event._id !== selectedId),
+      );
       setSelectedId("");
       setSuccess(response.message || "Event deleted successfully.");
     } catch (err) {
       console.error(err);
-      setError("Event delete failed. Confirm DELETE /admin/events/:id and the selected event ID.");
+      setError(
+        "Event delete failed. Confirm DELETE /admin/events/:id and the selected event ID.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -413,14 +498,22 @@ export default function EventsPage() {
       <div className="px-4 md:px-6 space-y-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">Event operations</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">Manage BiblePlus events</h2>
+            <p className="text-sm font-medium text-blue-300">
+              Event operations
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-white">
+              Manage BiblePlus events
+            </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
-              Review event lists, find upcoming or past events, patch event details, and update livestream links.
+              Review event lists, find upcoming or past events, patch event
+              details, and update livestream links.
             </p>
           </div>
 
-          <form onSubmit={handleSearch} className="flex w-full gap-2 xl:w-[420px]">
+          <form
+            onSubmit={handleSearch}
+            className="flex w-full gap-2 xl:w-[420px]"
+          >
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
               <input
@@ -457,7 +550,11 @@ export default function EventsPage() {
             disabled={isLoading}
             className="ml-auto inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 transition-colors hover:border-slate-700 disabled:opacity-60"
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
             Refresh
           </button>
         </div>
@@ -468,7 +565,9 @@ export default function EventsPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Upload banner</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Upload banner
+              </h3>
               <p className="text-sm text-slate-400">
                 POST /api/admin/events/upload-banner with form-data key banner.
               </p>
@@ -477,7 +576,9 @@ export default function EventsPage() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(event) => setBannerFile(event.target.files?.[0] || null)}
+                onChange={(event) =>
+                  setBannerFile(event.target.files?.[0] || null)
+                }
                 className="block w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-800 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-700"
               />
               <button
@@ -486,13 +587,23 @@ export default function EventsPage() {
                 disabled={!bannerFile || isUploadingBanner}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
               >
-                {isUploadingBanner ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {isUploadingBanner ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
                 Upload banner
               </button>
               {bannerUrl && (
                 <div className="mt-4 rounded-lg bg-slate-950 p-3">
                   <p className="text-xs text-slate-500">Uploaded URL</p>
-                  <p className="mt-1 break-all text-sm font-medium text-slate-200">{bannerUrl}</p>
+                  <p className="mt-1 break-all text-sm font-medium text-slate-200">
+                    {bannerUrl}
+                  </p>
+                  <p className="mt-2 text-xs text-emerald-300">
+                    This URL is now applied to the Create Event coverImage
+                    field.
+                  </p>
                 </div>
               )}
             </div>
@@ -500,7 +611,9 @@ export default function EventsPage() {
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Upload gallery</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Upload gallery
+              </h3>
               <p className="text-sm text-slate-400">
                 POST /api/admin/events/gallery/upload with form-data key images.
               </p>
@@ -519,14 +632,21 @@ export default function EventsPage() {
                 disabled={!galleryFiles?.length || isUploadingBanner}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
               >
-                {isUploadingBanner ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {isUploadingBanner ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
                 Upload gallery
               </button>
               {galleryUrls.length > 0 && (
                 <div className="mt-4 max-h-32 space-y-2 overflow-y-auto rounded-lg bg-slate-950 p-3">
                   <p className="text-xs text-slate-500">Uploaded image URLs</p>
                   {galleryUrls.map((url) => (
-                    <p key={url} className="break-all text-sm font-medium text-slate-200">
+                    <p
+                      key={url}
+                      className="break-all text-sm font-medium text-slate-200"
+                    >
                       {url}
                     </p>
                   ))}
@@ -537,7 +657,9 @@ export default function EventsPage() {
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Create event category</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Create event category
+              </h3>
               <p className="text-sm text-slate-400">
                 POST /api/admin/event-categories with JSON name.
               </p>
@@ -554,7 +676,11 @@ export default function EventsPage() {
                 disabled={isSaving || !categoryName.trim()}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm font-semibold text-slate-100 transition-colors hover:bg-slate-800 disabled:opacity-60"
               >
-                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
                 Create category
               </button>
             </form>
@@ -562,7 +688,9 @@ export default function EventsPage() {
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Create speaker</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Create speaker
+              </h3>
               <p className="text-sm text-slate-400">
                 POST /api/admin/speakers with JSON name and bio.
               </p>
@@ -572,13 +700,22 @@ export default function EventsPage() {
                 label="Speaker name"
                 value={speakerForm.name}
                 placeholder="John Henry"
-                onChange={(value) => setSpeakerForm((current) => ({ ...current, name: value }))}
+                onChange={(value) =>
+                  setSpeakerForm((current) => ({ ...current, name: value }))
+                }
               />
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-slate-300">Bio</span>
+                <span className="mb-2 block text-sm font-medium text-slate-300">
+                  Bio
+                </span>
                 <textarea
                   value={speakerForm.bio}
-                  onChange={(event) => setSpeakerForm((current) => ({ ...current, bio: event.target.value }))}
+                  onChange={(event) =>
+                    setSpeakerForm((current) => ({
+                      ...current,
+                      bio: event.target.value,
+                    }))
+                  }
                   rows={3}
                   placeholder="Speaker Bio"
                   className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
@@ -589,7 +726,11 @@ export default function EventsPage() {
                 disabled={isSaving || !speakerForm.name.trim()}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm font-semibold text-slate-100 transition-colors hover:bg-slate-800 disabled:opacity-60"
               >
-                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
                 Create speaker
               </button>
             </form>
@@ -604,46 +745,66 @@ export default function EventsPage() {
             </p>
           </div>
 
-          <form onSubmit={handleCreate} className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <form
+            onSubmit={handleCreate}
+            className="grid grid-cols-1 gap-4 lg:grid-cols-2"
+          >
             <TextField
               label="Title"
               value={createForm.title}
-              onChange={(value) => setCreateForm((current) => ({ ...current, title: value }))}
+              onChange={(value) =>
+                setCreateForm((current) => ({ ...current, title: value }))
+              }
             />
             <TextField
               label="Location"
               value={createForm.location}
-              onChange={(value) => setCreateForm((current) => ({ ...current, location: value }))}
+              onChange={(value) =>
+                setCreateForm((current) => ({ ...current, location: value }))
+              }
             />
             <TextField
               label="Category"
               value={createForm.category}
               placeholder="general"
-              onChange={(value) => setCreateForm((current) => ({ ...current, category: value }))}
+              onChange={(value) =>
+                setCreateForm((current) => ({ ...current, category: value }))
+              }
             />
             <TextField
               label="Cover image URL"
               value={createForm.coverImage}
               placeholder="/uploads/events/banners/..."
-              onChange={(value) => setCreateForm((current) => ({ ...current, coverImage: value }))}
+              onChange={(value) =>
+                setCreateForm((current) => ({ ...current, coverImage: value }))
+              }
             />
-            <TextField
+            <DateTimeField
               label="Start date"
               value={createForm.startDate}
-              placeholder="2024-01-01T10:00:00.000Z"
-              onChange={(value) => setCreateForm((current) => ({ ...current, startDate: value }))}
+              onChange={(value) =>
+                setCreateForm((current) => ({ ...current, startDate: value }))
+              }
             />
-            <TextField
+            <DateTimeField
               label="End date"
               value={createForm.endDate}
-              placeholder="2024-01-01T14:00:00.000Z"
-              onChange={(value) => setCreateForm((current) => ({ ...current, endDate: value }))}
+              onChange={(value) =>
+                setCreateForm((current) => ({ ...current, endDate: value }))
+              }
             />
             <label className="block lg:col-span-2">
-              <span className="mb-2 block text-sm font-medium text-slate-300">Description</span>
+              <span className="mb-2 block text-sm font-medium text-slate-300">
+                Description
+              </span>
               <textarea
                 value={createForm.description}
-                onChange={(event) => setCreateForm((current) => ({ ...current, description: event.target.value }))}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    description: event.target.value,
+                  }))
+                }
                 rows={4}
                 className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
               />
@@ -653,13 +814,21 @@ export default function EventsPage() {
               <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-white">Livestream</p>
-                  <p className="text-xs text-slate-400">These become liveStream.platform, liveStream.url, and liveStream.thumbnail.</p>
+                  <p className="text-xs text-slate-400">
+                    These become liveStream.platform, liveStream.url, and
+                    liveStream.thumbnail.
+                  </p>
                 </div>
                 <label className="flex items-center gap-2 text-sm text-slate-300">
                   <input
                     type="checkbox"
                     checked={createForm.isOnline}
-                    onChange={(event) => setCreateForm((current) => ({ ...current, isOnline: event.target.checked }))}
+                    onChange={(event) =>
+                      setCreateForm((current) => ({
+                        ...current,
+                        isOnline: event.target.checked,
+                      }))
+                    }
                     className="h-4 w-4 rounded border-slate-700 bg-slate-950"
                   />
                   Online event
@@ -671,29 +840,54 @@ export default function EventsPage() {
                   label="Platform"
                   value={createForm.liveStreamPlatform}
                   placeholder="YouTube"
-                  onChange={(value) => setCreateForm((current) => ({ ...current, liveStreamPlatform: value }))}
+                  onChange={(value) =>
+                    setCreateForm((current) => ({
+                      ...current,
+                      liveStreamPlatform: value,
+                    }))
+                  }
                 />
                 <TextField
                   label="URL"
                   value={createForm.liveStreamUrl}
                   placeholder="https://youtube.com/live/..."
-                  onChange={(value) => setCreateForm((current) => ({ ...current, liveStreamUrl: value }))}
+                  onChange={(value) =>
+                    setCreateForm((current) => ({
+                      ...current,
+                      liveStreamUrl: value,
+                    }))
+                  }
                 />
                 <TextField
                   label="Thumbnail"
                   value={createForm.liveStreamThumbnail}
                   placeholder="https://..."
-                  onChange={(value) => setCreateForm((current) => ({ ...current, liveStreamThumbnail: value }))}
+                  onChange={(value) =>
+                    setCreateForm((current) => ({
+                      ...current,
+                      liveStreamThumbnail: value,
+                    }))
+                  }
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isSaving || !createForm.title.trim() || !createForm.description.trim() || !createForm.startDate.trim() || !createForm.endDate.trim()}
+              disabled={
+                isSaving ||
+                !createForm.title.trim() ||
+                !createForm.description.trim() ||
+                !createForm.startDate.trim() ||
+                !createForm.endDate.trim()
+              }
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60 lg:col-span-2"
             >
-              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
               Create event
             </button>
           </form>
@@ -704,7 +898,9 @@ export default function EventsPage() {
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-white">Events</h3>
-                <p className="text-sm text-slate-400">{events.length} records loaded</p>
+                <p className="text-sm text-slate-400">
+                  {events.length} records loaded
+                </p>
               </div>
               <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold capitalize text-slate-300">
                 {activeView}
@@ -730,15 +926,26 @@ export default function EventsPage() {
                     }`}
                   >
                     <div className="mb-3 flex items-start justify-between gap-3">
-                      <h4 className="line-clamp-2 text-sm font-semibold text-white">{getEventTitle(event)}</h4>
+                      <h4 className="line-clamp-2 text-sm font-semibold text-white">
+                        {getEventTitle(event)}
+                      </h4>
                       <span className="shrink-0 rounded-full bg-slate-800 px-2 py-1 text-xs font-semibold capitalize text-slate-300">
                         {event.status || (event.isLive ? "live" : "event")}
                       </span>
                     </div>
                     <div className="space-y-2 text-xs text-slate-400">
-                      <EventMeta icon={CalendarDays} text={formatDate(getEventDate(event))} />
-                      <EventMeta icon={MapPin} text={event.location || "No location"} />
-                      <EventMeta icon={Radio} text={getLiveStreamUrl(event) || "No livestream link"} />
+                      <EventMeta
+                        icon={CalendarDays}
+                        text={formatDate(getEventDate(event))}
+                      />
+                      <EventMeta
+                        icon={MapPin}
+                        text={event.location || "No location"}
+                      />
+                      <EventMeta
+                        icon={Radio}
+                        text={getLiveStreamUrl(event) || "No livestream link"}
+                      />
                     </div>
                   </button>
                 ))}
@@ -752,24 +959,68 @@ export default function EventsPage() {
 
           <aside className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Selected event</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Selected event
+              </h3>
               <p className="text-sm text-slate-400">
                 {selectedEvent ? selectedEvent._id : "Choose an event to edit."}
               </p>
             </div>
 
             <form onSubmit={handleUpdate} className="space-y-4">
-              <TextField label="Title" value={form.title} onChange={(value) => setForm((current) => ({ ...current, title: value }))} disabled={!selectedEvent} />
-              <TextField label="Start date" value={form.startDate} onChange={(value) => setForm((current) => ({ ...current, startDate: value }))} disabled={!selectedEvent} />
-              <TextField label="End date" value={form.endDate} onChange={(value) => setForm((current) => ({ ...current, endDate: value }))} disabled={!selectedEvent} />
-              <TextField label="Location" value={form.location} onChange={(value) => setForm((current) => ({ ...current, location: value }))} disabled={!selectedEvent} />
-              <TextField label="Status" value={form.status} onChange={(value) => setForm((current) => ({ ...current, status: value }))} disabled={!selectedEvent} />
+              <TextField
+                label="Title"
+                value={form.title}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, title: value }))
+                }
+                disabled={!selectedEvent}
+              />
+              <DateTimeField
+                label="Start date"
+                value={form.startDate}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, startDate: value }))
+                }
+                disabled={!selectedEvent}
+              />
+              <DateTimeField
+                label="End date"
+                value={form.endDate}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, endDate: value }))
+                }
+                disabled={!selectedEvent}
+              />
+              <TextField
+                label="Location"
+                value={form.location}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, location: value }))
+                }
+                disabled={!selectedEvent}
+              />
+              <TextField
+                label="Status"
+                value={form.status}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, status: value }))
+                }
+                disabled={!selectedEvent}
+              />
 
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-slate-300">Description</span>
+                <span className="mb-2 block text-sm font-medium text-slate-300">
+                  Description
+                </span>
                 <textarea
                   value={form.description}
-                  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      description: event.target.value,
+                    }))
+                  }
                   disabled={!selectedEvent}
                   rows={5}
                   className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
@@ -781,7 +1032,11 @@ export default function EventsPage() {
                 disabled={!selectedEvent || isSaving}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
               >
-                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
                 Patch event
               </button>
             </form>
@@ -800,24 +1055,36 @@ export default function EventsPage() {
               <TextField
                 label="Livestream platform"
                 value={form.liveStreamPlatform}
-                onChange={(value) => setForm((current) => ({ ...current, liveStreamPlatform: value }))}
+                onChange={(value) =>
+                  setForm((current) => ({
+                    ...current,
+                    liveStreamPlatform: value,
+                  }))
+                }
                 disabled={!selectedEvent}
               />
               <div className="mt-4">
                 <TextField
-                label="Livestream URL"
-                value={form.liveStreamUrl}
-                onChange={(value) => setForm((current) => ({ ...current, liveStreamUrl: value }))}
-                disabled={!selectedEvent}
-              />
+                  label="Livestream URL"
+                  value={form.liveStreamUrl}
+                  onChange={(value) =>
+                    setForm((current) => ({ ...current, liveStreamUrl: value }))
+                  }
+                  disabled={!selectedEvent}
+                />
               </div>
               <div className="mt-4">
                 <TextField
-                label="Livestream thumbnail"
-                value={form.liveStreamThumbnail}
-                onChange={(value) => setForm((current) => ({ ...current, liveStreamThumbnail: value }))}
-                disabled={!selectedEvent}
-              />
+                  label="Livestream thumbnail"
+                  value={form.liveStreamThumbnail}
+                  onChange={(value) =>
+                    setForm((current) => ({
+                      ...current,
+                      liveStreamThumbnail: value,
+                    }))
+                  }
+                  disabled={!selectedEvent}
+                />
               </div>
               <button
                 type="button"
@@ -836,7 +1103,13 @@ export default function EventsPage() {
   );
 }
 
-function EventMeta({ icon: Icon, text }: { icon: React.ComponentType<{ className?: string }>; text: string }) {
+function EventMeta({
+  icon: Icon,
+  text,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  text: string;
+}) {
   return (
     <div className="flex min-w-0 items-center gap-2">
       <Icon className="h-4 w-4 shrink-0 text-slate-500" />
@@ -860,7 +1133,9 @@ function TextField({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-medium text-slate-300">{label}</span>
+      <span className="mb-2 block text-sm font-medium text-slate-300">
+        {label}
+      </span>
       <input
         value={value}
         placeholder={placeholder}
@@ -872,7 +1147,40 @@ function TextField({
   );
 }
 
-function Notice({ tone, message }: { tone: "error" | "success"; message: string }) {
+function DateTimeField({
+  label,
+  value,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-slate-300">
+        {label}
+      </span>
+      <input
+        type="datetime-local"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        disabled={disabled}
+        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
+      />
+    </label>
+  );
+}
+
+function Notice({
+  tone,
+  message,
+}: {
+  tone: "error" | "success";
+  message: string;
+}) {
   const isError = tone === "error";
   return (
     <div
@@ -882,7 +1190,11 @@ function Notice({ tone, message }: { tone: "error" | "success"; message: string 
           : "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
       }`}
     >
-      {isError ? <Clock className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+      {isError ? (
+        <Clock className="h-4 w-4" />
+      ) : (
+        <CheckCircle2 className="h-4 w-4" />
+      )}
       {message}
     </div>
   );
