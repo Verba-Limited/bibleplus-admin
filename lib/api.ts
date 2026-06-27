@@ -338,7 +338,6 @@ export const eventsApi = {
     const response = await axiosInstance.post<EventBannerUploadResponse>(
       "/admin/events/upload-banner",
       data,
-      { headers: { "Content-Type": "multipart/form-data" } },
     );
     return response.data;
   },
@@ -352,7 +351,6 @@ export const eventsApi = {
     const response = await axiosInstance.post<EventGalleryUploadResponse>(
       "/admin/events/gallery/upload",
       data,
-      { headers: { "Content-Type": "multipart/form-data" } },
     );
     return response.data;
   },

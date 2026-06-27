@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
-import { analyticsApi, type AnalyticsActivityDay, type AnalyticsOverview, type AnalyticsTrending, type SystemHealth } from "@/lib/api";
+import {
+  analyticsApi,
+  type AnalyticsActivityDay,
+  type AnalyticsOverview,
+  type AnalyticsTrending,
+  type SystemHealth,
+} from "@/lib/api";
 import {
   Activity,
   Bell,
@@ -109,17 +115,19 @@ export default function AnalyticsPage() {
       });
 
       const failedCount = [overview, activity, trending, system].filter(
-        (result) => result.status === "rejected"
+        (result) => result.status === "rejected",
       ).length;
 
       if (failedCount) {
         setError(
-          `${failedCount} analytics request${failedCount > 1 ? "s" : ""} timed out or failed. Showing the data that loaded.`
+          `${failedCount} analytics request${failedCount > 1 ? "s" : ""} timed out or failed. Showing the data that loaded.`,
         );
       }
     } catch (err) {
       console.error(err);
-      setError("Could not load analytics right now. Check the API token or try again.");
+      setError(
+        "Could not load analytics right now. Check the API token or try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -138,9 +146,9 @@ export default function AnalyticsPage() {
           prayers: totals.prayers + (day.prayers || 0),
           events: totals.events + (day.events || 0),
         }),
-        { users: 0, blogs: 0, prayers: 0, events: 0 }
+        { users: 0, blogs: 0, prayers: 0, events: 0 },
       ),
-    [analytics.activity]
+    [analytics.activity],
   );
 
   const memoryUsed = analytics.system?.memory.heapUsed || 0;
@@ -155,9 +163,12 @@ export default function AnalyticsPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-medium text-blue-300">Admin analytics</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">BiblePlus performance</h2>
+            <h2 className="mt-1 text-2xl font-bold text-white">
+              BiblePlus performance
+            </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
-              Live overview, activity trends, trending posts, and backend health from the admin analytics API.
+              Live overview, activity trends, trending posts, and backend health
+              from the admin analytics API.
             </p>
           </div>
           <button
@@ -166,7 +177,11 @@ export default function AnalyticsPage() {
             disabled={isLoading}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 transition-colors hover:border-slate-600 hover:bg-slate-800 disabled:opacity-60"
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
             Refresh
           </button>
         </div>
@@ -178,30 +193,81 @@ export default function AnalyticsPage() {
         )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricCard icon={Users} label="Total users" value={formatNumber(analytics.overview?.totalUsers)} />
-          <MetricCard icon={BookOpen} label="Blogs" value={formatNumber(analytics.overview?.totalBlogs)} />
-          <MetricCard icon={CalendarDays} label="Events" value={formatNumber(analytics.overview?.totalEvents)} />
-          <MetricCard icon={Bell} label="Notifications" value={formatNumber(analytics.overview?.totalNotifications)} />
+          <MetricCard
+            icon={Users}
+            label="Total users"
+            value={formatNumber(analytics.overview?.totalUsers)}
+          />
+          <MetricCard
+            icon={BookOpen}
+            label="Blogs"
+            value={formatNumber(analytics.overview?.totalBlogs)}
+          />
+          <MetricCard
+            icon={CalendarDays}
+            label="Events"
+            value={formatNumber(analytics.overview?.totalEvents)}
+          />
+          <MetricCard
+            icon={Bell}
+            label="Notifications"
+            value={formatNumber(analytics.overview?.totalNotifications)}
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <MetricCard icon={Heart} label="Prayers" value={formatNumber(analytics.overview?.totalPrayers)} compact />
-          <MetricCard icon={Activity} label="Likes" value={formatNumber(analytics.overview?.totalLikes)} compact />
-          <MetricCard icon={BookOpen} label="Bookmarks" value={formatNumber(analytics.overview?.totalBookmarks)} compact />
+          <MetricCard
+            icon={Heart}
+            label="Prayers"
+            value={formatNumber(analytics.overview?.totalPrayers)}
+            compact
+          />
+          <MetricCard
+            icon={Activity}
+            label="Likes"
+            value={formatNumber(analytics.overview?.totalLikes)}
+            compact
+          />
+          <MetricCard
+            icon={BookOpen}
+            label="Bookmarks"
+            value={formatNumber(analytics.overview?.totalBookmarks)}
+            compact
+          />
         </div>
 
         <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(340px,0.9fr)]">
           <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">Daily activity</h3>
-                <p className="text-sm text-slate-400">Users, blogs, prayers, and events by date.</p>
+                <h3 className="text-lg font-semibold text-white">
+                  Daily activity
+                </h3>
+                <p className="text-sm text-slate-400">
+                  Users, blogs, prayers, and events by date.
+                </p>
               </div>
               <div className="grid grid-cols-4 gap-2 text-center text-xs">
-                <ActivityPill label="Users" value={totalActivity.users} color="bg-blue-400" />
-                <ActivityPill label="Blogs" value={totalActivity.blogs} color="bg-emerald-400" />
-                <ActivityPill label="Prayers" value={totalActivity.prayers} color="bg-pink-400" />
-                <ActivityPill label="Events" value={totalActivity.events} color="bg-amber-400" />
+                <ActivityPill
+                  label="Users"
+                  value={totalActivity.users}
+                  color="bg-blue-400"
+                />
+                <ActivityPill
+                  label="Blogs"
+                  value={totalActivity.blogs}
+                  color="bg-emerald-400"
+                />
+                <ActivityPill
+                  label="Prayers"
+                  value={totalActivity.prayers}
+                  color="bg-pink-400"
+                />
+                <ActivityPill
+                  label="Events"
+                  value={totalActivity.events}
+                  color="bg-amber-400"
+                />
               </div>
             </div>
 
@@ -209,19 +275,68 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <AreaChart data={analytics.activity}>
                   <defs>
-                    <linearGradient id="activityUsers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.35} />
+                    <linearGradient
+                      id="activityUsers"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="#60a5fa"
+                        stopOpacity={0.35}
+                      />
                       <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 12 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 12 }} allowDecimals={false} />
-                  <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "8px", color: "#fff" }} />
-                  <Area type="monotone" dataKey="users" stroke="#60a5fa" fill="url(#activityUsers)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="blogs" stroke="#34d399" fill="#34d39922" strokeWidth={2} />
-                  <Area type="monotone" dataKey="prayers" stroke="#f472b6" fill="#f472b622" strokeWidth={2} />
-                  <Area type="monotone" dataKey="events" stroke="#fbbf24" fill="#fbbf2422" strokeWidth={2} />
+                  <XAxis
+                    dataKey="date"
+                    stroke="#64748b"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    stroke="#64748b"
+                    tick={{ fontSize: 12 }}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0f172a",
+                      border: "1px solid #334155",
+                      borderRadius: "8px",
+                      color: "#fff",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="users"
+                    stroke="#60a5fa"
+                    fill="url(#activityUsers)"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="blogs"
+                    stroke="#34d399"
+                    fill="#34d39922"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="prayers"
+                    stroke="#f472b6"
+                    fill="#f472b622"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="events"
+                    stroke="#fbbf24"
+                    fill="#fbbf2422"
+                    strokeWidth={2}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -229,8 +344,12 @@ export default function AnalyticsPage() {
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">System health</h3>
-              <p className="text-sm text-slate-400">Backend availability and memory usage.</p>
+              <h3 className="text-lg font-semibold text-white">
+                System health
+              </h3>
+              <p className="text-sm text-slate-400">
+                Backend availability and memory usage.
+              </p>
             </div>
 
             <div className="space-y-4">
@@ -257,21 +376,40 @@ export default function AnalyticsPage() {
                     </span>
                     <div>
                       <p className="text-sm font-semibold text-white">Memory</p>
-                      <p className="text-xs text-slate-400">{formatBytes(memoryUsed)} of {formatBytes(memoryTotal)}</p>
+                      <p className="text-xs text-slate-400">
+                        {formatBytes(memoryUsed)} of {formatBytes(memoryTotal)}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold text-white">{memoryPercent}%</span>
+                  <span className="text-sm font-semibold text-white">
+                    {memoryPercent}%
+                  </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-slate-800">
-                  <div className="h-full rounded-full bg-blue-400" style={{ width: `${memoryPercent}%` }} />
+                  <div
+                    className="h-full rounded-full bg-blue-400"
+                    style={{ width: `${memoryPercent}%` }}
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <MiniStat label="Uptime" value={formatUptime(analytics.system?.uptime)} />
-                <MiniStat label="RSS" value={formatBytes(analytics.system?.memory.rss)} />
-                <MiniStat label="External" value={formatBytes(analytics.system?.memory.external)} />
-                <MiniStat label="Array buffers" value={formatBytes(analytics.system?.memory.arrayBuffers)} />
+                <MiniStat
+                  label="Uptime"
+                  value={formatUptime(analytics.system?.uptime)}
+                />
+                <MiniStat
+                  label="RSS"
+                  value={formatBytes(analytics.system?.memory.rss)}
+                />
+                <MiniStat
+                  label="External"
+                  value={formatBytes(analytics.system?.memory.external)}
+                />
+                <MiniStat
+                  label="Array buffers"
+                  value={formatBytes(analytics.system?.memory.arrayBuffers)}
+                />
               </div>
             </div>
           </section>
@@ -280,19 +418,36 @@ export default function AnalyticsPage() {
         <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[minmax(340px,0.9fr)_minmax(0,1.3fr)]">
           <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Trending blogs</h3>
-              <p className="text-sm text-slate-400">Top content returned by the trending endpoint.</p>
+              <h3 className="text-lg font-semibold text-white">
+                Trending blogs
+              </h3>
+              <p className="text-sm text-slate-400">
+                Top content returned by the trending endpoint.
+              </p>
             </div>
             <div className="space-y-3">
-              {(analytics.trending?.trendingBlogs || []).slice(0, 5).map((blog, index) => (
-                <article key={blog._id || index} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                  <div className="mb-2 flex items-start justify-between gap-3">
-                    <h4 className="line-clamp-2 text-sm font-semibold text-white">{blog.title}</h4>
-                    <span className="rounded-full bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-300">#{index + 1}</span>
-                  </div>
-                  <p className="line-clamp-3 text-xs leading-5 text-slate-400">{stripHtml(blog.content) || blog.slug || "No summary available."}</p>
-                </article>
-              ))}
+              {(analytics.trending?.trendingBlogs || [])
+                .slice(0, 5)
+                .map((blog, index) => (
+                  <article
+                    key={blog._id || index}
+                    className="rounded-lg border border-slate-800 bg-slate-950/60 p-4"
+                  >
+                    <div className="mb-2 flex items-start justify-between gap-3">
+                      <h4 className="line-clamp-2 text-sm font-semibold text-white">
+                        {blog.title}
+                      </h4>
+                      <span className="rounded-full bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-300">
+                        #{index + 1}
+                      </span>
+                    </div>
+                    <p className="line-clamp-3 text-xs leading-5 text-slate-400">
+                      {stripHtml(blog.content) ||
+                        blog.slug ||
+                        "No summary available."}
+                    </p>
+                  </article>
+                ))}
               {!isLoading && !analytics.trending?.trendingBlogs?.length && (
                 <EmptyPanel message="No trending blogs returned yet." />
               )}
@@ -302,23 +457,56 @@ export default function AnalyticsPage() {
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
               <h3 className="text-lg font-semibold text-white">Content mix</h3>
-              <p className="text-sm text-slate-400">High-level distribution from the overview endpoint.</p>
+              <p className="text-sm text-slate-400">
+                High-level distribution from the overview endpoint.
+              </p>
             </div>
             <div className="h-[320px] min-w-0">
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart
+                  barSize={32}
                   data={[
-                    { name: "Users", value: analytics.overview?.totalUsers || 0 },
-                    { name: "Blogs", value: analytics.overview?.totalBlogs || 0 },
-                    { name: "Events", value: analytics.overview?.totalEvents || 0 },
-                    { name: "Prayers", value: analytics.overview?.totalPrayers || 0 },
-                    { name: "Notifications", value: analytics.overview?.totalNotifications || 0 },
+                    {
+                      name: "Users",
+                      value: analytics.overview?.totalUsers || 0,
+                    },
+                    {
+                      name: "Blogs",
+                      value: analytics.overview?.totalBlogs || 0,
+                    },
+                    {
+                      name: "Events",
+                      value: analytics.overview?.totalEvents || 0,
+                    },
+                    {
+                      name: "Prayers",
+                      value: analytics.overview?.totalPrayers || 0,
+                    },
+                    {
+                      name: "Notifications",
+                      value: analytics.overview?.totalNotifications || 0,
+                    },
                   ]}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 12 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 12 }} allowDecimals={false} />
-                  <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "8px", color: "#fff" }} />
+                  <XAxis
+                    dataKey="name"
+                    stroke="#64748b"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    stroke="#64748b"
+                    tick={{ fontSize: 12 }}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0f172a",
+                      border: "1px solid #334155",
+                      borderRadius: "8px",
+                      color: "#fff",
+                    }}
+                  />
                   <Bar dataKey="value" fill="#38bdf8" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -342,11 +530,17 @@ function MetricCard({
   compact?: boolean;
 }) {
   return (
-    <div className={`rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm ${compact ? "p-4" : "p-5"}`}>
+    <div
+      className={`rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm ${compact ? "p-4" : "p-5"}`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-slate-400">{label}</p>
-          <p className={`${compact ? "mt-1 text-2xl" : "mt-2 text-3xl"} font-bold text-white`}>{value}</p>
+          <p
+            className={`${compact ? "mt-1 text-2xl" : "mt-2 text-3xl"} font-bold text-white`}
+          >
+            {value}
+          </p>
         </div>
         <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-slate-300">
           <Icon className="h-5 w-5" />
@@ -356,7 +550,15 @@ function MetricCard({
   );
 }
 
-function ActivityPill({ label, value, color }: { label: string; value: number; color: string }) {
+function ActivityPill({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: string;
+}) {
   return (
     <div className="rounded-lg bg-slate-950/70 px-3 py-2">
       <div className="flex items-center justify-center gap-1.5">

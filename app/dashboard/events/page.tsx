@@ -2,6 +2,8 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { eventsApi, type BibleplusEvent, type EventPayload } from "@/lib/api";
 import {
   CalendarDays,
@@ -91,7 +93,8 @@ function toDateTimeLocal(value?: string) {
 
 function fromDateTimeLocal(value: string) {
   if (!value) return "";
-  const date = new Date(value);
+  const dateOnlyPattern = /^\d{4}-\d{2}-\d{2}$/;
+  const date = new Date(dateOnlyPattern.test(value) ? `${value}T00:00` : value);
   return Number.isNaN(date.getTime()) ? value : date.toISOString();
 }
 
@@ -142,6 +145,12 @@ export default function EventsPage() {
   const selectedEvent = useMemo(
     () => events.find((event) => event._id === selectedId) || null,
     [events, selectedId],
+  );
+  const canCreateEvent = Boolean(
+    createForm.title.trim() &&
+    createForm.description.trim() &&
+    createForm.startDate.trim() &&
+    createForm.endDate.trim(),
   );
 
   const loadEvents = async (view = activeView) => {
@@ -562,7 +571,7 @@ export default function EventsPage() {
         {error && <Notice tone="error" message={error} />}
         {success && <Notice tone="success" message={success} />}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-2">
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
               <h3 className="text-lg font-semibold text-white">
@@ -655,7 +664,7 @@ export default function EventsPage() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
+          {/* <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
               <h3 className="text-lg font-semibold text-white">
                 Create event category
@@ -684,7 +693,7 @@ export default function EventsPage() {
                 Create category
               </button>
             </form>
-          </section>
+          </section> */}
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
@@ -779,14 +788,14 @@ export default function EventsPage() {
                 setCreateForm((current) => ({ ...current, coverImage: value }))
               }
             />
-            <DateTimeField
+            <DateField
               label="Start date"
               value={createForm.startDate}
               onChange={(value) =>
                 setCreateForm((current) => ({ ...current, startDate: value }))
               }
             />
-            <DateTimeField
+            <DateField
               label="End date"
               value={createForm.endDate}
               onChange={(value) =>
@@ -874,13 +883,7 @@ export default function EventsPage() {
 
             <button
               type="submit"
-              disabled={
-                isSaving ||
-                !createForm.title.trim() ||
-                !createForm.description.trim() ||
-                !createForm.startDate.trim() ||
-                !createForm.endDate.trim()
-              }
+              disabled={isSaving || !canCreateEvent}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60 lg:col-span-2"
             >
               {isSaving ? (
@@ -1037,7 +1040,7 @@ export default function EventsPage() {
                 ) : (
                   <Send className="h-4 w-4" />
                 )}
-                Patch event
+                Edit event
               </button>
             </form>
 
@@ -1147,6 +1150,40 @@ function TextField({
   );
 }
 
+function DateField({
+  label,
+  value,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}) {
+  const selected = value ? new Date(value) : null;
+
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-slate-300">
+        {label}
+      </span>
+      <DatePicker
+        selected={selected}
+        onChange={(date: Date | null) =>
+          onChange(date ? date.toISOString().split("T")[0] : "")
+        }
+        disabled={disabled}
+        dateFormat="MMM d, yyyy"
+        placeholderText="Pick a date"
+        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+        calendarClassName="!bg-slate-900 !border-slate-700 !text-white"
+        wrapperClassName="w-full"
+      />
+    </label>
+  );
+}
+
 function DateTimeField({
   label,
   value,
@@ -1158,17 +1195,32 @@ function DateTimeField({
   disabled?: boolean;
   onChange: (value: string) => void;
 }) {
+  // Convert datetime-local string (e.g. "2025-06-01T14:30") to Date
+  const selected = value ? new Date(value) : null;
+
   return (
     <label className="block">
       <span className="mb-2 block text-sm font-medium text-slate-300">
         {label}
       </span>
-      <input
-        type="datetime-local"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+      <DatePicker
+        selected={selected}
+        onChange={(date: Date | null) => {
+          if (!date) return onChange("");
+          const pad = (n: number) => String(n).padStart(2, "0");
+          onChange(
+            `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`,
+          );
+        }}
         disabled={disabled}
-        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
+        showTimeSelect
+        timeFormat="HH:mm"
+        timeIntervals={15}
+        dateFormat="MMM d, yyyy h:mm aa"
+        placeholderText="Pick a date & time"
+        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+        calendarClassName="!bg-slate-900 !border-slate-700 !text-white"
+        wrapperClassName="w-full"
       />
     </label>
   );

@@ -140,3 +140,34 @@
     scrollbar-width: none;
   }
 }
+
+/* react-datepicker dark theme */
+.react-datepicker {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #fff !important;
+}
+.react-datepicker__header {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__time-list-item {
+  color: #e2e8f0 !important;
+}
+.react-datepicker__day {
+  color: #cbd5e1 !important;
+}
+.react-datepicker__day:hover,
+.react-datepicker__time-list-item:hover {
+  background-color: #334155 !important;
+}
+.react-datepicker__day--selected,
+.react-datepicker__time-list-item--selected {
+  background-color: #2563eb !important;
+  color: #fff !important;
+}
+.react-datepicker__day--keyboard-selected {
+  background-color: #1d4ed8 !important;
+}
