@@ -251,7 +251,7 @@ export default function DashboardPage() {
               <QuickLink href="/dashboard/events" label="Events" />
               <QuickLink href="/dashboard/analytics" label="Analytics" />
               <QuickLink href="/dashboard/content" label="Content" />
-              <QuickLink href="/dashboard/users" label="Users" />
+              <QuickLink href="/dashboard/quiz" label="Quiz" />
             </div>
           </section>
         </div>

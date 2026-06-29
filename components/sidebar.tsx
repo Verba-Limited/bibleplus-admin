@@ -8,7 +8,6 @@ import { clearAuthSession, getAuthSession } from "@/lib/auth";
 import {
   LayoutDashboard,
   BarChart3,
-  Users,
   FileText,
   Shield,
   Bell,
@@ -51,7 +50,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { label: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
     { label: "Events", icon: CalendarDays, href: "/dashboard/events" },
     { label: "Blogs", icon: Book, href: "/dashboard/blogs" },
-    { label: "Users", icon: Users, href: "/dashboard/users" },
+    { label: "Quiz", icon: HelpCircle, href: "/dashboard/quiz" },
     { label: "Content", icon: FileText, href: "/dashboard/content" },
     { label: "Roles", icon: Shield, href: "/dashboard/roles" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },

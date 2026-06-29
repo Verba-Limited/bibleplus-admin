@@ -178,6 +178,21 @@ export interface BibleplusBlog {
   [key: string]: unknown;
 }
 
+export interface QuizQuestionPayload {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  level: number;
+  difficulty: string;
+}
+
+export interface QuizQuestion extends QuizQuestionPayload {
+  _id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: unknown;
+}
+
 // Admin API endpoints
 export const adminApi = {
   login: async (username: string, password: string) => {
@@ -472,6 +487,16 @@ export const usersApi = {
   },
 };
 
+// Quiz endpoints
+export const quizApi = {
+  createBulk: async (questions: QuizQuestionPayload[]) => {
+    const response = await axiosInstance.post<
+      ApiResponse<QuizQuestion[]> | QuizQuestion[]
+    >("/admin/quiz/bulk", questions);
+    return response.data;
+  },
+};
+
 // Content API endpoints
 export const contentApi = {
   getAll: async (params?: any) => {
@@ -511,6 +536,7 @@ export default {
   blogsApi,
   dashboardApi,
   eventsApi,
+  quizApi,
   usersApi,
   contentApi,
 };

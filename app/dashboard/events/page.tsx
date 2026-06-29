@@ -200,6 +200,7 @@ export default function EventsPage() {
   //     liveStreamThumbnail: selectedEvent.liveStream?.thumbnail || "",
   //   });
   // }, [selectedEvent]);
+
   useEffect(() => {
     if (!selectedEvent) return;
 

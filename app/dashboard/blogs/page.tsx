@@ -186,7 +186,10 @@ export default function BlogsPage() {
       if (response.data?._id) {
         setSelectedId(response.data._id);
         setBlogs((current) => {
-          const nextBlogs = mergeBlogs([response.data as BibleplusBlog], current);
+          const nextBlogs = mergeBlogs(
+            [response.data as BibleplusBlog],
+            current,
+          );
           storeBlogs(nextBlogs);
           return nextBlogs;
         });
@@ -213,7 +216,10 @@ export default function BlogsPage() {
       setSuccess(response.message || "Blog updated successfully.");
       if (response.data?._id) {
         setBlogs((current) => {
-          const nextBlogs = mergeBlogs([response.data as BibleplusBlog], current);
+          const nextBlogs = mergeBlogs(
+            [response.data as BibleplusBlog],
+            current,
+          );
           storeBlogs(nextBlogs);
           return nextBlogs;
         });
@@ -336,7 +342,7 @@ export default function BlogsPage() {
               controls, refresh tools, and safe delete actions.
             </p>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="grid grid-rows-2 md:grid-rows-1 sm:grid-rows-2 gap-2 sm:flex-row">
             <button
               type="button"
               onClick={handleRefreshExternal}
@@ -346,7 +352,7 @@ export default function BlogsPage() {
               <RefreshCw
                 className={`h-4 w-4 ${isSaving ? "animate-spin" : ""}`}
               />
-              Refresh external
+              Refresh Background
             </button>
             <button
               type="button"
@@ -359,7 +365,7 @@ export default function BlogsPage() {
               ) : (
                 <RefreshCw className="h-4 w-4" />
               )}
-              Load public list
+              Refresh blog library
             </button>
           </div>
         </div>
@@ -389,7 +395,8 @@ export default function BlogsPage() {
                   Blog library
                 </h3>
                 <p className="text-sm text-slate-400">
-                  Public posts plus locally saved admin drafts from this browser.
+                  Public posts plus locally saved admin drafts from this
+                  browser.
                 </p>
               </div>
               <div className="relative w-full md:w-72">
