@@ -3,7 +3,9 @@ import { AUTH_TOKEN_KEY, clearAuthSession } from "./auth";
 
 // Create axios instance
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://bibleplus-backend-nhyo.onrender.com/api",
   timeout: 60000,
   headers: {
     "Content-Type": "application/json",
@@ -21,11 +23,6 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
-    if (typeof FormData !== "undefined" && config.data instanceof FormData) {
-      delete config.headers["Content-Type"];
-    }
-
     return config;
   },
   (error) => {
