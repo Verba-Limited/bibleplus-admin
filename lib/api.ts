@@ -70,6 +70,7 @@ export interface BibleplusEvent {
   location?: string;
   image?: string;
   status?: string;
+  frequency?: string;
   liveStream?: {
     platform?: string;
     url?: string;
@@ -93,6 +94,7 @@ export interface EventPayload {
   category?: string;
   coverImage?: string;
   isOnline?: boolean;
+  frequency?: string;
   liveStream?: {
     platform?: string;
     url?: string;
@@ -321,8 +323,8 @@ export const eventsApi = {
   },
 
   update: async (id: string, data: Partial<BibleplusEvent>) => {
-    const response = await axiosInstance.patch<ApiResponse<BibleplusEvent>>(
-      `/events/${id}`,
+    const response = await axiosInstance.put<ApiResponse<BibleplusEvent>>(
+      `/admin/events/${id}`,
       data,
     );
     return response.data;

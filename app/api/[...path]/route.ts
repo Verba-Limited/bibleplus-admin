@@ -23,11 +23,30 @@ async function proxyRequest(request: NextRequest, context: RouteContext) {
   headers.delete("content-length");
 
   const hasBody = !["GET", "HEAD"].includes(request.method);
-  const response = await fetch(targetUrl, {
-    method: request.method,
-    headers,
-    body: hasBody ? await request.arrayBuffer() : undefined,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(targetUrl, {
+      method: request.method,
+      headers,
+      body: hasBody ? await request.arrayBuffer() : undefined,
+    });
+  } catch (error) {
+    const cause =
+      error instanceof Error && "cause" in error
+        ? (error.cause as { code?: string; hostname?: string } | undefined)
+        : undefined;
+    const hostname = cause?.hostname || targetUrl.hostname;
+    const code = cause?.code ? ` (${cause.code})` : "";
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: `Could not reach the BiblePlus backend at ${hostname}${code}. Check API_URL/NEXT_PUBLIC_API_URL or confirm the backend is online.`,
+      },
+      { status: 502 },
+    );
+  }
 
   const responseHeaders = new Headers();
   const contentType = response.headers.get("content-type");

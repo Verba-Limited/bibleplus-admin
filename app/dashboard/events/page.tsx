@@ -59,9 +59,10 @@ function getLiveStreamUrl(event: BibleplusEvent) {
 
 function getRequestErrorMessage(error: unknown, fallback: string) {
   if (typeof error === "object" && error && "response" in error) {
-    const response = (error as { response?: { data?: { message?: string } } })
-      .response;
-    return response?.data?.message || fallback;
+    const response = (
+      error as { response?: { data?: { message?: string; error?: string } } }
+    ).response;
+    return response?.data?.message || response?.data?.error || fallback;
   }
 
   return fallback;
@@ -125,6 +126,7 @@ export default function EventsPage() {
     location: "",
     coverImage: "",
     category: "",
+    frequency: "",
     isOnline: false,
     liveStreamPlatform: "",
     liveStreamUrl: "",
@@ -174,7 +176,10 @@ export default function EventsPage() {
     } catch (err) {
       console.error(err);
       setError(
-        "Could not load events. Confirm the endpoint path and admin token.",
+        getRequestErrorMessage(
+          err,
+          "Could not load events. Confirm the endpoint path and admin token.",
+        ),
       );
     } finally {
       setIsLoading(false);
@@ -227,6 +232,7 @@ export default function EventsPage() {
     location: values.location,
     coverImage: values.coverImage || bannerUrl,
     category: values.category,
+    frequency: values.frequency,
     isOnline: values.isOnline || Boolean(values.liveStreamUrl),
     liveStream: {
       platform: values.liveStreamPlatform,
@@ -270,6 +276,7 @@ export default function EventsPage() {
         coverImage: "",
         category: "",
         isOnline: false,
+        frequency: "",
         liveStreamPlatform: "",
         liveStreamUrl: "",
         liveStreamThumbnail: "",
@@ -578,9 +585,9 @@ export default function EventsPage() {
               <h3 className="text-lg font-semibold text-white">
                 Upload banner
               </h3>
-              <p className="text-sm text-slate-400">
+              {/* <p className="text-sm text-slate-400">
                 POST /api/admin/events/upload-banner with form-data key banner.
-              </p>
+              </p> */}
             </div>
             <div className="rounded-lg border border-dashed border-slate-700 bg-slate-950/60 p-4">
               <input
@@ -614,52 +621,6 @@ export default function EventsPage() {
                     This URL is now applied to the Create Event coverImage
                     field.
                   </p>
-                </div>
-              )}
-            </div>
-          </section>
-
-          <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
-            <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">
-                Upload gallery
-              </h3>
-              <p className="text-sm text-slate-400">
-                POST /api/admin/events/gallery/upload with form-data key images.
-              </p>
-            </div>
-            <div className="rounded-lg border border-dashed border-slate-700 bg-slate-950/60 p-4">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(event) => setGalleryFiles(event.target.files)}
-                className="block w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-800 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-700"
-              />
-              <button
-                type="button"
-                onClick={handleUploadGallery}
-                disabled={!galleryFiles?.length || isUploadingBanner}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
-              >
-                {isUploadingBanner ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Upload className="h-4 w-4" />
-                )}
-                Upload gallery
-              </button>
-              {galleryUrls.length > 0 && (
-                <div className="mt-4 max-h-32 space-y-2 overflow-y-auto rounded-lg bg-slate-950 p-3">
-                  <p className="text-xs text-slate-500">Uploaded image URLs</p>
-                  {galleryUrls.map((url) => (
-                    <p
-                      key={url}
-                      className="break-all text-sm font-medium text-slate-200"
-                    >
-                      {url}
-                    </p>
-                  ))}
                 </div>
               )}
             </div>
@@ -701,9 +662,9 @@ export default function EventsPage() {
               <h3 className="text-lg font-semibold text-white">
                 Create speaker
               </h3>
-              <p className="text-sm text-slate-400">
+              {/* <p className="text-sm text-slate-400">
                 POST /api/admin/speakers with JSON name and bio.
-              </p>
+              </p> */}
             </div>
             <form onSubmit={handleCreateSpeaker} className="space-y-4">
               <TextField
@@ -750,9 +711,9 @@ export default function EventsPage() {
         <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
           <div className="mb-5">
             <h3 className="text-lg font-semibold text-white">Create event</h3>
-            <p className="text-sm text-slate-400">
+            {/* <p className="text-sm text-slate-400">
               POST /api/admin/events. Add livestream URL inside liveStream.url.
-            </p>
+            </p> */}
           </div>
 
           <form
@@ -803,6 +764,27 @@ export default function EventsPage() {
                 setCreateForm((current) => ({ ...current, endDate: value }))
               }
             />
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-300">
+                Frequency
+              </span>
+              <select
+                value={createForm.frequency}
+                onChange={(event) =>
+                  setCreateForm((current) => ({
+                    ...current,
+                    frequency: event.target.value,
+                  }))
+                }
+                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors focus:border-blue-500"
+              >
+                <option value="Once">Once</option>
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Yearly">Yearly</option>
+              </select>
+            </label>
             <label className="block lg:col-span-2">
               <span className="mb-2 block text-sm font-medium text-slate-300">
                 Description
