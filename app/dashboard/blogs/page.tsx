@@ -585,32 +585,6 @@ export default function BlogsPage() {
                 Delete
               </button>
             </div>
-
-            <div className="mt-6 border-t border-slate-800 pt-5">
-              <h4 className="text-sm font-semibold text-white">
-                Delete comment
-              </h4>
-              <p className="mt-1 text-xs text-slate-400">
-                Paste a comment id to remove it from the admin blogs endpoint.
-              </p>
-              <div className="mt-3 flex gap-2">
-                <input
-                  value={commentId}
-                  onChange={(event) => setCommentId(event.target.value)}
-                  placeholder="Comment id"
-                  className="h-10 min-w-0 flex-1 rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
-                />
-                <button
-                  type="button"
-                  onClick={handleDeleteComment}
-                  disabled={isSaving || !commentId.trim()}
-                  className="inline-flex items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 px-3 text-red-200 transition-colors hover:bg-red-500/15 disabled:opacity-60"
-                  aria-label="Delete comment"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
           </aside>
         </div>
       </div>

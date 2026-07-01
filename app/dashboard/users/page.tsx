@@ -118,7 +118,9 @@ function parseQuestions(value: string) {
   return parsed;
 }
 
-function getResponseCount(response: ApiResponse<QuizQuestion[]> | QuizQuestion[]) {
+function getResponseCount(
+  response: ApiResponse<QuizQuestion[]> | QuizQuestion[],
+) {
   if (Array.isArray(response)) return response.length;
   if (Array.isArray(response.data)) return response.data.length;
   return 0;
@@ -170,7 +172,9 @@ export default function QuizPage() {
       const response = await quizApi.createBulk(questions);
       const count = getResponseCount(response) || questions.length;
       const message = Array.isArray(response) ? "" : response.message;
-      setSuccess(message || `${count} quiz question${count === 1 ? "" : "s"} created.`);
+      setSuccess(
+        message || `${count} quiz question${count === 1 ? "" : "s"} created.`,
+      );
     } catch (err) {
       console.error(err);
       setError(
@@ -189,9 +193,7 @@ export default function QuizPage() {
       <div className="px-4 md:px-6 space-y-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">
-              Quiz operations
-            </p>
+            <p className="text-sm font-medium text-blue-300">Quiz operations</p>
             <h2 className="mt-1 text-2xl font-bold text-white">
               Bulk create quiz questions
             </h2>
@@ -240,12 +242,12 @@ export default function QuizPage() {
               <button
                 type="submit"
                 disabled={isSaving || !parsedQuestions.length}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-[10px] font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
               >
                 {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  <Send className="h-4 w-4" />
+                  <Send className="h-3 w-3" />
                 )}
                 Create bulk quiz
               </button>

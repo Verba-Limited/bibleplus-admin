@@ -195,6 +195,28 @@ export interface QuizQuestion extends QuizQuestionPayload {
   [key: string]: unknown;
 }
 
+export interface BibleplusBook {
+  _id: string;
+  title: string;
+  author: string;
+  description?: string;
+  coverImage?: string;
+  category?: string;
+  audience?: string;
+  source?: string;
+  totalChapters?: number;
+  isFetched?: boolean;
+  publishedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  [key: string]: unknown;
+}
+
+export interface BooksListResponse extends ApiResponse<BibleplusBook[]> {
+  count?: number;
+}
+
 // Admin API endpoints
 export const adminApi = {
   login: async (username: string, password: string) => {
@@ -499,6 +521,39 @@ export const quizApi = {
   },
 };
 
+// Books endpoints
+export const booksApi = {
+  getAll: async (params?: any) => {
+    const response = await axiosInstance.get<BooksListResponse>("/books", {
+      params,
+    });
+    return response.data;
+  },
+
+  create: async (data: FormData) => {
+    const response = await axiosInstance.post<ApiResponse<BibleplusBook>>(
+      "/admin/books",
+      data,
+    );
+    return response.data;
+  },
+
+  update: async (id: string, data: FormData) => {
+    const response = await axiosInstance.put<ApiResponse<BibleplusBook>>(
+      `/admin/books/${id}`,
+      data,
+    );
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await axiosInstance.delete<ApiResponse<BibleplusBook>>(
+      `/admin/books/${id}`,
+    );
+    return response.data;
+  },
+};
+
 // Content API endpoints
 export const contentApi = {
   getAll: async (params?: any) => {
@@ -538,6 +593,7 @@ export default {
   blogsApi,
   dashboardApi,
   eventsApi,
+  booksApi,
   quizApi,
   usersApi,
   contentApi,

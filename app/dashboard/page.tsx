@@ -250,7 +250,7 @@ export default function DashboardPage() {
             <div className="mt-5 grid grid-cols-2 gap-3">
               <QuickLink href="/dashboard/events" label="Events" />
               <QuickLink href="/dashboard/analytics" label="Analytics" />
-              <QuickLink href="/dashboard/content" label="Content" />
+              <QuickLink href="/dashboard/books" label="Books" />
               <QuickLink href="/dashboard/quiz" label="Quiz" />
             </div>
           </section>

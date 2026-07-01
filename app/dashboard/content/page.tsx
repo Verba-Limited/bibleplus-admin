@@ -1,14 +1,5 @@
-import { DashboardLayout } from '@/components/dashboard-layout'
+import { redirect } from "next/navigation";
 
 export default function ContentPage() {
-  return (
-    <DashboardLayout title="Content">
-      <div className="px-6">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-12 text-center backdrop-blur-sm">
-          <h2 className="text-2xl font-bold text-white mb-2">Content</h2>
-          <p className="text-slate-400">Content management dashboard coming soon</p>
-        </div>
-      </div>
-    </DashboardLayout>
-  )
+  redirect("/dashboard/books");
 }
