@@ -52,6 +52,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { label: "Blogs", icon: Book, href: "/dashboard/blogs" },
     { label: "Quiz", icon: HelpCircle, href: "/dashboard/quiz" },
     { label: "Books", icon: BookOpen, href: "/dashboard/books" },
+    { label: "Verse", icon: BookOpen, href: "/dashboard/users" },
     { label: "Roles", icon: Shield, href: "/dashboard/roles" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
     { label: "Database", icon: Database, href: "/dashboard/database" },
@@ -64,7 +65,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     {
       label: "Notifications",
       icon: Bell,
-      href: "/dashboard/account-notifications",
+      href: "/dashboard/notifications",
     },
     { label: "Settings", icon: Settings, href: "/dashboard/account-settings" },
     {
@@ -122,7 +123,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3">
               Management
             </p>
-            {menuItems.slice(1, 7).map((item) => (
+            {menuItems.slice(1, 8).map((item) => (
               <SidebarLink
                 key={item.href}
                 item={item}
@@ -135,7 +136,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3">
               System
             </p>
-            {menuItems.slice(7, 11).map((item) => (
+            {menuItems.slice(8, 12).map((item) => (
               <SidebarLink
                 key={item.href}
                 item={item}

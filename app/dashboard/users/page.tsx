@@ -2,185 +2,104 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
+import { verseApi, type VerseOfDay, type VerseOfDayPayload } from "@/lib/api";
 import {
-  quizApi,
-  type ApiResponse,
-  type QuizQuestion,
-  type QuizQuestionPayload,
-} from "@/lib/api";
-import {
+  BookOpen,
+  CalendarDays,
   CheckCircle2,
-  ClipboardList,
+  Clock,
+  FileText,
+  Hash,
   Loader2,
   RefreshCw,
   Send,
 } from "lucide-react";
 
-const sampleQuestions: QuizQuestionPayload[] = [
-  {
-    question: "Who was the mother of Samuel the prophet?",
-    options: ["Deborah", "Hannah", "Ruth", "Naomi"],
-    correctAnswer: "Hannah",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "How many years did the Israelites wander in the wilderness?",
-    options: ["20 years", "30 years", "40 years", "50 years"],
-    correctAnswer: "40 years",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "Which king of Israel had 700 wives and 300 concubines?",
-    options: ["David", "Solomon", "Rehoboam", "Ahab"],
-    correctAnswer: "Solomon",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "What was the name of the angel who appeared to Mary?",
-    options: ["Michael", "Raphael", "Gabriel", "Uriel"],
-    correctAnswer: "Gabriel",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "Who was the first king of Israel?",
-    options: ["David", "Solomon", "Saul", "Samuel"],
-    correctAnswer: "Saul",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "In which river was Jesus baptized?",
-    options: ["Euphrates", "Nile", "Jordan", "Tigris"],
-    correctAnswer: "Jordan",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "Who wrote the book of Revelation?",
-    options: ["Paul", "Peter", "John", "Luke"],
-    correctAnswer: "John",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "What was the name of Moses' father-in-law?",
-    options: ["Jethro", "Aaron", "Caleb", "Joshua"],
-    correctAnswer: "Jethro",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "Which prophet was taken to heaven in a chariot of fire?",
-    options: ["Isaiah", "Elisha", "Elijah", "Ezekiel"],
-    correctAnswer: "Elijah",
-    level: 10,
-    difficulty: "expert",
-  },
-  {
-    question: "How many plagues did God send upon Egypt?",
-    options: ["7", "8", "10", "12"],
-    correctAnswer: "10",
-    level: 10,
-    difficulty: "expert",
-  },
-];
-
-const sampleJson = JSON.stringify(sampleQuestions, null, 2);
-
-function isQuestionPayload(value: unknown): value is QuizQuestionPayload {
-  if (!value || typeof value !== "object") return false;
-  const question = value as QuizQuestionPayload;
-
-  return (
-    typeof question.question === "string" &&
-    Array.isArray(question.options) &&
-    question.options.length >= 2 &&
-    question.options.every((option) => typeof option === "string") &&
-    typeof question.correctAnswer === "string" &&
-    question.options.includes(question.correctAnswer) &&
-    typeof question.level === "number" &&
-    typeof question.difficulty === "string"
-  );
-}
-
-function parseQuestions(value: string) {
-  const parsed = JSON.parse(value) as unknown;
-  if (!Array.isArray(parsed) || !parsed.every(isQuestionPayload)) {
-    throw new Error(
-      "Enter a JSON array of questions. Each question needs question, options, correctAnswer, level, and difficulty.",
-    );
-  }
-
-  return parsed;
-}
-
-function getResponseCount(
-  response: ApiResponse<QuizQuestion[]> | QuizQuestion[],
-) {
-  if (Array.isArray(response)) return response.length;
-  if (Array.isArray(response.data)) return response.data.length;
-  return 0;
-}
+const sampleVerse: VerseOfDayPayload = {
+  date: "2024-01-01",
+  reference: "John 3:16",
+  book: "John",
+  chapter: 3,
+  verse: 16,
+  text: "For God so loved the world...",
+  translation: "KJV",
+};
 
 function getRequestErrorMessage(error: unknown, fallback: string) {
   if (typeof error === "object" && error && "response" in error) {
-    const response = (error as { response?: { data?: { message?: string } } })
-      .response;
-    return response?.data?.message || fallback;
+    const response = (
+      error as { response?: { data?: { message?: string; error?: string } } }
+    ).response;
+    return response?.data?.message || response?.data?.error || fallback;
   }
 
-  return error instanceof Error ? error.message : fallback;
+  return fallback;
 }
 
-export default function QuizPage() {
-  const [payload, setPayload] = useState(sampleJson);
+function today() {
+  return new Date().toISOString().split("T")[0];
+}
+
+export default function VerseOfDayPage() {
+  const [form, setForm] = useState<VerseOfDayPayload>({
+    ...sampleVerse,
+    date: today(),
+  });
+  const [savedVerse, setSavedVerse] = useState<VerseOfDay | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const parsedQuestions = useMemo(() => {
-    try {
-      return parseQuestions(payload);
-    } catch {
-      return [];
-    }
-  }, [payload]);
+  const canSubmit = Boolean(
+    form.date.trim() &&
+      form.reference.trim() &&
+      form.book.trim() &&
+      form.chapter > 0 &&
+      form.verse > 0 &&
+      form.text.trim() &&
+      form.translation.trim(),
+  );
 
-  const stats = useMemo(
+  const preview = useMemo(
     () => ({
-      total: parsedQuestions.length,
-      levels: new Set(parsedQuestions.map((question) => question.level)).size,
-      difficulties: new Set(
-        parsedQuestions.map((question) => question.difficulty),
-      ).size,
+      ...form,
+      chapter: Number(form.chapter) || 0,
+      verse: Number(form.verse) || 0,
     }),
-    [parsedQuestions],
+    [form],
   );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!canSubmit) {
+      setError("Date, reference, book, chapter, verse, text, and translation are required.");
+      return;
+    }
+
     setIsSaving(true);
     setError("");
     setSuccess("");
 
     try {
-      const questions = parseQuestions(payload);
-      const response = await quizApi.createBulk(questions);
-      const count = getResponseCount(response) || questions.length;
-      const message = Array.isArray(response) ? "" : response.message;
-      setSuccess(
-        message || `${count} quiz question${count === 1 ? "" : "s"} created.`,
-      );
+      const payload: VerseOfDayPayload = {
+        date: form.date.trim(),
+        reference: form.reference.trim(),
+        book: form.book.trim(),
+        chapter: Number(form.chapter),
+        verse: Number(form.verse),
+        text: form.text.trim(),
+        translation: form.translation.trim(),
+      };
+      const response = await verseApi.setVerseOfDay(payload);
+      setSavedVerse(response.data || null);
+      setSuccess(response.message || "Verse of the day set successfully.");
     } catch (err) {
       console.error(err);
       setError(
         getRequestErrorMessage(
           err,
-          "Bulk quiz upload failed. Confirm the JSON and POST /admin/quiz/bulk.",
+          "Could not set verse of the day. Confirm POST /admin/verse/set and the JSON body.",
         ),
       );
     } finally {
@@ -189,23 +108,24 @@ export default function QuizPage() {
   };
 
   return (
-    <DashboardLayout title="Quiz">
-      <div className="px-4 md:px-6 space-y-6">
+    <DashboardLayout title="Verse of the Day">
+      <div className="space-y-6 px-4 md:px-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">Quiz operations</p>
+            <p className="text-sm font-medium text-blue-300">Daily verse</p>
             <h2 className="mt-1 text-2xl font-bold text-white">
-              Bulk create quiz questions
+              Set verse of the day
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
-              Paste a JSON array and send it to POST /api/admin/quiz/bulk.
+              Choose the date and scripture details to lock in the BiblePlus
+              verse of the day.
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => {
-              setPayload(sampleJson);
+              setForm(sampleVerse);
               setError("");
               setSuccess("");
             }}
@@ -219,102 +139,166 @@ export default function QuizPage() {
         {error && <Notice tone="error" message={error} />}
         {success && <Notice tone="success" message={success} />}
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <StatCard label="Questions ready" value={stats.total} />
-          <StatCard label="Levels" value={stats.levels} />
-          <StatCard label="Difficulties" value={stats.difficulties} />
-        </div>
-
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.2fr)_420px]"
+          className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]"
         >
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold text-white">
-                  Bulk payload
+                  Verse details
                 </h3>
                 <p className="text-sm text-slate-400">
-                  correctAnswer must match one of the options exactly.
+                  Sends JSON to POST /api/admin/verse/set.
                 </p>
               </div>
               <button
                 type="submit"
-                disabled={isSaving || !parsedQuestions.length}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-[10px] font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                disabled={isSaving || !canSubmit}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
               >
                 {isSaving ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Send className="h-3 w-3" />
+                  <Send className="h-4 w-4" />
                 )}
-                Create bulk quiz
+                Set verse
               </button>
             </div>
 
-            <textarea
-              value={payload}
-              onChange={(event) => {
-                setPayload(event.target.value);
-                setError("");
-                setSuccess("");
-              }}
-              spellCheck={false}
-              className="min-h-[560px] w-full resize-y rounded-lg border border-slate-800 bg-slate-950 p-4 font-mono text-sm leading-6 text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
-            />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <TextField
+                icon={CalendarDays}
+                label="Date"
+                type="date"
+                value={form.date}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, date: value }))
+                }
+              />
+              <TextField
+                icon={BookOpen}
+                label="Reference"
+                value={form.reference}
+                placeholder="John 3:16"
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, reference: value }))
+                }
+              />
+              <TextField
+                icon={BookOpen}
+                label="Book"
+                value={form.book}
+                placeholder="John"
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, book: value }))
+                }
+              />
+              <TextField
+                icon={Hash}
+                label="Chapter"
+                type="number"
+                min={1}
+                value={String(form.chapter)}
+                onChange={(value) =>
+                  setForm((current) => ({
+                    ...current,
+                    chapter: Number(value),
+                  }))
+                }
+              />
+              <TextField
+                icon={Hash}
+                label="Verse"
+                type="number"
+                min={1}
+                value={String(form.verse)}
+                onChange={(value) =>
+                  setForm((current) => ({
+                    ...current,
+                    verse: Number(value),
+                  }))
+                }
+              />
+              <TextField
+                icon={FileText}
+                label="Translation"
+                value={form.translation}
+                placeholder="KJV"
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, translation: value }))
+                }
+              />
+              <label className="block md:col-span-2">
+                <span className="mb-2 block text-sm font-medium text-slate-300">
+                  Verse text
+                </span>
+                <textarea
+                  value={form.text}
+                  placeholder="For God so loved the world..."
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      text: event.target.value,
+                    }))
+                  }
+                  rows={6}
+                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                />
+              </label>
+            </div>
           </section>
 
-          <aside className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
-            <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Preview</h3>
-              <p className="text-sm text-slate-400">
-                Showing the first parsed questions from the JSON editor.
-              </p>
-            </div>
+          <aside className="space-y-6">
+            <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
+              <div className="mb-5">
+                <h3 className="text-lg font-semibold text-white">Preview</h3>
+                <p className="text-sm text-slate-400">
+                  This is the payload that will be saved.
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-blue-300">
+                  {preview.date}
+                </p>
+                <blockquote className="mt-4 text-lg font-semibold leading-7 text-white">
+                  "{preview.text || "Verse text"}"
+                </blockquote>
+                <p className="mt-4 text-sm font-semibold text-slate-300">
+                  {preview.reference || "Reference"} -{" "}
+                  {preview.translation || "Translation"}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {preview.book || "Book"} {preview.chapter}:{preview.verse}
+                </p>
+              </div>
+            </section>
 
-            {parsedQuestions.length ? (
-              <div className="space-y-3">
-                {parsedQuestions.slice(0, 6).map((question, index) => (
-                  <article
-                    key={`${question.question}-${index}`}
-                    className="rounded-lg border border-slate-800 bg-slate-950/60 p-4"
-                  >
-                    <div className="mb-3 flex items-start gap-3">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-sm font-bold text-blue-300">
-                        {index + 1}
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold text-white">
-                          {question.question}
-                        </p>
-                        <p className="mt-1 text-xs capitalize text-slate-400">
-                          Level {question.level} / {question.difficulty}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {question.options.map((option) => (
-                        <span
-                          key={option}
-                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                            option === question.correctAnswer
-                              ? "bg-emerald-500/10 text-emerald-300"
-                              : "bg-slate-800 text-slate-300"
-                          }`}
-                        >
-                          {option}
-                        </span>
-                      ))}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-lg border border-dashed border-slate-700 p-8 text-center text-sm text-slate-400">
-                Valid quiz JSON will appear here.
-              </div>
-            )}
+            <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
+              <h3 className="text-lg font-semibold text-white">
+                Last saved response
+              </h3>
+              {savedVerse ? (
+                <div className="mt-4 rounded-lg bg-slate-950 p-4 text-sm text-slate-300">
+                  <p className="break-all text-xs text-slate-500">
+                    ID: {savedVerse._id}
+                  </p>
+                  <p className="mt-3 font-semibold text-white">
+                    {savedVerse.reference}
+                  </p>
+                  <p className="mt-2 text-slate-400">{savedVerse.text}</p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    <Tag>{savedVerse.source || "admin"}</Tag>
+                    <Tag>{savedVerse.locked ? "locked" : "unlocked"}</Tag>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-lg border border-dashed border-slate-700 p-6 text-center text-sm text-slate-400">
+                  The saved verse response will appear here.
+                </div>
+              )}
+            </section>
           </aside>
         </form>
       </div>
@@ -322,12 +306,48 @@ export default function QuizPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function TextField({
+  icon: Icon,
+  label,
+  type = "text",
+  min,
+  value,
+  placeholder,
+  onChange,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  type?: string;
+  min?: number;
+  value: string;
+  placeholder?: string;
+  onChange: (value: string) => void;
+}) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
-      <p className="text-sm text-slate-400">{label}</p>
-      <p className="mt-2 text-3xl font-bold text-white">{value}</p>
-    </div>
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-slate-300">
+        {label}
+      </span>
+      <div className="relative">
+        <Icon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+        <input
+          type={type}
+          min={min}
+          value={value}
+          placeholder={placeholder}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+        />
+      </div>
+    </label>
+  );
+}
+
+function Tag({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full bg-slate-800 px-2 py-1 font-semibold text-slate-300">
+      {children}
+    </span>
   );
 }
 
@@ -349,7 +369,7 @@ function Notice({
       }`}
     >
       {isError ? (
-        <ClipboardList className="h-4 w-4" />
+        <Clock className="h-4 w-4" />
       ) : (
         <CheckCircle2 className="h-4 w-4" />
       )}

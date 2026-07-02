@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ConfirmAction } from "@/components/confirm-action";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -109,6 +110,7 @@ export default function EventsPage() {
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isDeletePending, setIsDeletePending] = useState(false);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerUrl, setBannerUrl] = useState("");
   const [galleryFiles, setGalleryFiles] = useState<FileList | null>(null);
@@ -208,6 +210,7 @@ export default function EventsPage() {
 
   useEffect(() => {
     if (!selectedEvent) return;
+    setIsDeletePending(false);
 
     setForm({
       title: getEventTitle(selectedEvent),
@@ -484,11 +487,6 @@ export default function EventsPage() {
   const handleDelete = async () => {
     if (!selectedId) return;
 
-    const confirmed = window.confirm(
-      `Delete "${selectedEvent ? getEventTitle(selectedEvent) : selectedId}"? This cannot be undone.`,
-    );
-    if (!confirmed) return;
-
     setIsSaving(true);
     setError("");
     setSuccess("");
@@ -499,6 +497,7 @@ export default function EventsPage() {
         current.filter((event) => event._id !== selectedId),
       );
       setSelectedId("");
+      setIsDeletePending(false);
       setSuccess(response.message || "Event deleted successfully.");
     } catch (err) {
       console.error(err);
@@ -1029,13 +1028,25 @@ export default function EventsPage() {
 
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={() => setIsDeletePending(true)}
               disabled={!selectedEvent || isSaving}
               className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/15 disabled:opacity-60"
             >
               <Trash2 className="h-4 w-4" />
               Delete event
             </button>
+
+            {isDeletePending && (
+              <div className="mt-3">
+                <ConfirmAction
+                  message={`Delete "${selectedEvent ? getEventTitle(selectedEvent) : selectedId}"? This cannot be undone.`}
+                  confirmLabel="Delete event"
+                  disabled={isSaving}
+                  onConfirm={handleDelete}
+                  onCancel={() => setIsDeletePending(false)}
+                />
+              </div>
+            )}
 
             <div className="mt-6 border-t border-slate-800 pt-5">
               <TextField

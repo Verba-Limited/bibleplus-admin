@@ -217,6 +217,57 @@ export interface BooksListResponse extends ApiResponse<BibleplusBook[]> {
   count?: number;
 }
 
+export interface BibleplusNotification {
+  _id: string;
+  target?: string;
+  userId?: string;
+  title: string;
+  message: string;
+  type?: string;
+  read?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  [key: string]: unknown;
+}
+
+export interface NotificationsListResponse
+  extends ApiResponse<BibleplusNotification[]> {
+  count?: number;
+  total?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface NotificationPayload {
+  title: string;
+  message: string;
+}
+
+export interface SendNotificationPayload extends NotificationPayload {
+  userId: string;
+}
+
+export interface VerseOfDayPayload {
+  date: string;
+  reference: string;
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+  translation: string;
+}
+
+export interface VerseOfDay extends VerseOfDayPayload {
+  _id: string;
+  locked?: boolean;
+  source?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  [key: string]: unknown;
+}
+
 // Admin API endpoints
 export const adminApi = {
   login: async (username: string, password: string) => {
@@ -554,6 +605,57 @@ export const booksApi = {
   },
 };
 
+// Notifications endpoints
+export const notificationsApi = {
+  getAll: async (params?: any) => {
+    const response = await axiosInstance.get<NotificationsListResponse>(
+      "/admin/notifications/all",
+      { params },
+    );
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await axiosInstance.delete<ApiResponse>(
+      `/admin/notifications/${id}`,
+    );
+    return response.data;
+  },
+
+  resend: async (id: string) => {
+    const response = await axiosInstance.post<ApiResponse>(
+      `/admin/notifications/${id}/resend`,
+    );
+    return response.data;
+  },
+
+  sendToUser: async (data: SendNotificationPayload) => {
+    const response = await axiosInstance.post<ApiResponse>(
+      "/admin/notifications/send",
+      data,
+    );
+    return response.data;
+  },
+
+  broadcast: async (data: NotificationPayload) => {
+    const response = await axiosInstance.post<
+      ApiResponse<BibleplusNotification>
+    >("/admin/notifications/broadcast", data);
+    return response.data;
+  },
+};
+
+// Verse endpoints
+export const verseApi = {
+  setVerseOfDay: async (data: VerseOfDayPayload) => {
+    const response = await axiosInstance.post<ApiResponse<VerseOfDay>>(
+      "/admin/verse/set",
+      data,
+    );
+    return response.data;
+  },
+};
+
 // Content API endpoints
 export const contentApi = {
   getAll: async (params?: any) => {
@@ -594,6 +696,8 @@ export default {
   dashboardApi,
   eventsApi,
   booksApi,
+  notificationsApi,
+  verseApi,
   quizApi,
   usersApi,
   contentApi,

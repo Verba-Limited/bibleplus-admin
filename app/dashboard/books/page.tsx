@@ -7,6 +7,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { ConfirmAction } from "@/components/confirm-action";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { booksApi, type BibleplusBook } from "@/lib/api";
 import {
@@ -72,6 +73,7 @@ export default function BooksPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isDeletePending, setIsDeletePending] = useState(false);
 
   const selectedBook = useMemo(
     () => books.find((book) => book._id === selectedId) || null,
@@ -120,6 +122,7 @@ export default function BooksPage() {
     if (!selectedBook) {
       setEditForm(emptyForm);
       setEditCover(null);
+      setIsDeletePending(false);
       return;
     }
 
@@ -131,6 +134,7 @@ export default function BooksPage() {
       audience: selectedBook.audience || "adults",
     });
     setEditCover(null);
+    setIsDeletePending(false);
   }, [selectedBook]);
 
   const buildBookFormData = (values: BookForm, nextCover: File | null) => {
@@ -229,11 +233,6 @@ export default function BooksPage() {
   const handleDelete = async () => {
     if (!selectedBook) return;
 
-    const confirmed = window.confirm(
-      `Delete "${selectedBook.title || selectedBook._id}"? This cannot be undone.`,
-    );
-    if (!confirmed) return;
-
     setIsSaving(true);
     setError("");
     setSuccess("");
@@ -244,6 +243,7 @@ export default function BooksPage() {
         current.filter((book) => book._id !== selectedBook._id),
       );
       setSelectedId("");
+      setIsDeletePending(false);
       setSuccess(response.message || "Book deleted successfully.");
     } catch (err) {
       console.error(err);
@@ -263,8 +263,12 @@ export default function BooksPage() {
       <div className="space-y-6 px-4 md:px-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">Library</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">Manage books</h2>
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">
+              The Catalog
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold text-white font-['Source_Serif_4',serif]">
+              Manage books
+            </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
               List published books and add new admin-created titles.
             </p>
@@ -277,7 +281,7 @@ export default function BooksPage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search books"
-                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
               />
             </div>
             <button
@@ -303,12 +307,14 @@ export default function BooksPage() {
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-lg font-semibold text-white">Books</h3>
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
+                  Books
+                </h3>
                 <p className="text-sm text-slate-400">
                   {filteredBooks.length} of {books.length} records shown
                 </p>
               </div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
+              <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400 font-['IBM_Plex_Mono',monospace]">
                 <BookOpen className="h-3.5 w-3.5" />
                 {filteredBooks.length} books
               </span>
@@ -321,43 +327,56 @@ export default function BooksPage() {
               </div>
             ) : filteredBooks.length ? (
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {filteredBooks.map((book) => (
-                  <button
-                    key={book._id}
-                    type="button"
-                    onClick={() => setSelectedId(book._id)}
-                    className={`overflow-hidden rounded-xl border bg-slate-950/60 text-left transition-colors ${
-                      selectedId === book._id
-                        ? "border-blue-500 bg-blue-500/10"
-                        : "border-slate-800 hover:border-slate-700"
-                    }`}
-                  >
-                    <div className="flex gap-4 p-4">
-                      <BookCover book={book} />
-                      <div className="min-w-0 flex-1">
-                        <h4 className="line-clamp-2 text-sm font-semibold text-white">
-                          {book.title || "Untitled book"}
-                        </h4>
-                        <p className="mt-1 text-sm text-slate-400">
-                          {book.author || "Unknown author"}
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <Tag>{book.category || "general"}</Tag>
-                          <Tag>{book.audience || "adults"}</Tag>
+                {filteredBooks.map((book) => {
+                  const isSelected = selectedId === book._id;
+                  return (
+                    <button
+                      key={book._id}
+                      type="button"
+                      onClick={() => setSelectedId(book._id)}
+                      className={`relative overflow-hidden rounded-xl border bg-slate-950/60 text-left transition-colors ${
+                        isSelected
+                          ? "border-amber-400/60 bg-amber-400/5"
+                          : "border-slate-800 hover:border-slate-700"
+                      }`}
+                    >
+                      {isSelected && (
+                        <span
+                          aria-hidden
+                          className="absolute left-0 top-0 z-10 h-9 w-2.5 bg-amber-400"
+                          style={{
+                            clipPath:
+                              "polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%)",
+                          }}
+                        />
+                      )}
+                      <div className="flex gap-4 p-4">
+                        <BookCover book={book} />
+                        <div className="min-w-0 flex-1">
+                          <h4 className="line-clamp-2 text-sm font-semibold text-white font-['Source_Serif_4',serif]">
+                            {book.title || "Untitled book"}
+                          </h4>
+                          <p className="mt-1 text-sm text-slate-400">
+                            {book.author || "Unknown author"}
+                          </p>
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            <Tag>{book.category || "general"}</Tag>
+                            <Tag>{book.audience || "adults"}</Tag>
+                          </div>
+                          <p className="mt-3 text-[11px] text-slate-500 font-['IBM_Plex_Mono',monospace]">
+                            {book.totalChapters || 0} ch ·{" "}
+                            {formatDate(book.publishedAt || book.createdAt)}
+                          </p>
                         </div>
-                        <p className="mt-3 text-xs text-slate-500">
-                          {book.totalChapters || 0} chapters -{" "}
-                          {formatDate(book.publishedAt || book.createdAt)}
-                        </p>
                       </div>
-                    </div>
-                    {book.description && (
-                      <p className="border-t border-slate-800 px-4 py-3 text-sm text-slate-400">
-                        {book.description}
-                      </p>
-                    )}
-                  </button>
-                ))}
+                      {book.description && (
+                        <p className="border-t border-slate-800 px-4 py-3 text-sm text-slate-400">
+                          {book.description}
+                        </p>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             ) : (
               <div className="rounded-lg border border-dashed border-slate-700 p-10 text-center text-sm text-slate-400">
@@ -368,7 +387,12 @@ export default function BooksPage() {
 
           <aside className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Create book</h3>
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">
+                Ledger
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-white font-['Source_Serif_4',serif]">
+                Create book
+              </h3>
               <p className="text-sm text-slate-400">
                 Sends form-data to POST /admin/books.
               </p>
@@ -417,7 +441,7 @@ export default function BooksPage() {
                     }))
                   }
                   rows={4}
-                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                 />
               </label>
 
@@ -443,7 +467,7 @@ export default function BooksPage() {
               <button
                 type="submit"
                 disabled={isSaving || !form.title.trim() || !form.author.trim()}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-300 disabled:opacity-60"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -456,10 +480,13 @@ export default function BooksPage() {
 
             <div className="mt-6 border-t border-slate-800 pt-5">
               <div className="mb-5">
-                <h3 className="text-lg font-semibold text-white">
+                <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">
+                  Ledger
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                   Selected book
                 </h3>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-slate-400 font-['IBM_Plex_Mono',monospace]">
                   {selectedBook
                     ? selectedBook._id
                     : "Choose a book to edit or delete."}
@@ -514,7 +541,7 @@ export default function BooksPage() {
                     }
                     disabled={!selectedBook}
                     rows={4}
-                    className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+                    className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400 disabled:opacity-60"
                   />
                 </label>
 
@@ -546,7 +573,7 @@ export default function BooksPage() {
                     !editForm.title.trim() ||
                     !editForm.author.trim()
                   }
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-300 disabled:opacity-60"
                 >
                   {isSaving ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -559,13 +586,25 @@ export default function BooksPage() {
 
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={() => setIsDeletePending(true)}
                 disabled={!selectedBook || isSaving}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/15 disabled:opacity-60"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete book
               </button>
+
+              {isDeletePending && selectedBook && (
+                <div className="mt-3">
+                  <ConfirmAction
+                    message={`Delete "${selectedBook.title || selectedBook._id}"? This cannot be undone.`}
+                    confirmLabel="Delete book"
+                    disabled={isSaving}
+                    onConfirm={handleDelete}
+                    onCancel={() => setIsDeletePending(false)}
+                  />
+                </div>
+              )}
             </div>
           </aside>
         </div>
@@ -594,7 +633,7 @@ function BookCover({ book }: { book: BibleplusBook }) {
 
 function Tag({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-300">
+    <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300 font-['IBM_Plex_Mono',monospace]">
       {children}
     </span>
   );
@@ -620,7 +659,7 @@ function TextField({
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400 disabled:opacity-60"
       />
     </label>
   );

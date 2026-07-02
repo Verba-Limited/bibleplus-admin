@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { ConfirmAction } from "@/components/confirm-action";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { blogsApi, type BibleplusBlog } from "@/lib/api";
 import {
@@ -94,6 +95,7 @@ export default function BlogsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isDeletePending, setIsDeletePending] = useState(false);
   const [commentId, setCommentId] = useState("");
   const [form, setForm] = useState({
     title: "",
@@ -155,6 +157,7 @@ export default function BlogsPage() {
 
   useEffect(() => {
     if (!selectedBlog) return;
+    setIsDeletePending(false);
 
     setForm((current) => ({
       ...current,
@@ -264,10 +267,6 @@ export default function BlogsPage() {
 
   const handleDelete = async () => {
     if (!targetBlogId) return;
-    const confirmed = window.confirm(
-      `Delete "${selectedBlog?.title || targetBlogId}"? This cannot be undone.`,
-    );
-    if (!confirmed) return;
 
     setIsSaving(true);
     setError("");
@@ -277,6 +276,7 @@ export default function BlogsPage() {
       const response = await blogsApi.delete(targetBlogId);
       setSuccess(response.message || "Blog deleted successfully.");
       setSelectedId("");
+      setIsDeletePending(false);
       setBlogs((current) => {
         const nextBlogs = current.filter((blog) => blog._id !== targetBlogId);
         storeBlogs(nextBlogs);
@@ -577,7 +577,7 @@ export default function BlogsPage() {
               </button>
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={() => setIsDeletePending(true)}
                 disabled={isSaving || !targetBlogId}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/15 disabled:opacity-60"
               >
@@ -585,6 +585,18 @@ export default function BlogsPage() {
                 Delete
               </button>
             </div>
+
+            {isDeletePending && (
+              <div className="mt-3">
+                <ConfirmAction
+                  message={`Delete "${selectedBlog?.title || targetBlogId}"? This cannot be undone.`}
+                  confirmLabel="Delete blog"
+                  disabled={isSaving}
+                  onConfirm={handleDelete}
+                  onCancel={() => setIsDeletePending(false)}
+                />
+              </div>
+            )}
           </aside>
         </div>
       </div>
