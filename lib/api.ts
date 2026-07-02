@@ -268,6 +268,40 @@ export interface VerseOfDay extends VerseOfDayPayload {
   [key: string]: unknown;
 }
 
+export interface AdminUserRecord {
+  _id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  role?: string;
+  verified?: boolean;
+  isDeleted?: boolean;
+  fcmToken?: string;
+  avatar?: string;
+  bio?: string;
+  location?: string;
+  notificationSettings?: {
+    push?: boolean;
+    email?: boolean;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: unknown;
+}
+
+export interface AdminUsersListResponse {
+  success: boolean;
+  data?: {
+    users?: AdminUserRecord[];
+    total?: number;
+    page?: number;
+    pages?: number;
+  };
+  message?: string;
+  error?: string;
+}
+
 // Admin API endpoints
 export const adminApi = {
   login: async (username: string, password: string) => {
@@ -562,6 +596,39 @@ export const usersApi = {
   },
 };
 
+// Admin users endpoints
+export const adminUsersApi = {
+  getAll: async (params?: any) => {
+    const response = await axiosInstance.get<AdminUsersListResponse>(
+      "/admin/users",
+      { params },
+    );
+    return response.data;
+  },
+
+  getById: async (id: string) => {
+    const response = await axiosInstance.get<
+      ApiResponse<AdminUserRecord | { user?: AdminUserRecord }>
+    >(`/admin/users/${id}`);
+    return response.data;
+  },
+
+  resetPassword: async (id: string, data?: { password?: string }) => {
+    const response = await axiosInstance.put<ApiResponse>(
+      `/admin/users/${id}/reset-password`,
+      data || {},
+    );
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await axiosInstance.delete<ApiResponse>(
+      `/admin/users/${id}`,
+    );
+    return response.data;
+  },
+};
+
 // Quiz endpoints
 export const quizApi = {
   createBulk: async (questions: QuizQuestionPayload[]) => {
@@ -699,6 +766,7 @@ export default {
   notificationsApi,
   verseApi,
   quizApi,
+  adminUsersApi,
   usersApi,
   contentApi,
 };

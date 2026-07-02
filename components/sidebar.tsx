@@ -8,7 +8,6 @@ import { clearAuthSession, getAuthSession } from "@/lib/auth";
 import {
   LayoutDashboard,
   BarChart3,
-  Shield,
   Bell,
   Database,
   Settings,
@@ -52,8 +51,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { label: "Blogs", icon: Book, href: "/dashboard/blogs" },
     { label: "Quiz", icon: HelpCircle, href: "/dashboard/quiz" },
     { label: "Books", icon: BookOpen, href: "/dashboard/books" },
-    { label: "Verse", icon: BookOpen, href: "/dashboard/users" },
-    { label: "Roles", icon: Shield, href: "/dashboard/roles" },
+    { label: "Verse", icon: BookOpen, href: "/dashboard/verse" },
+    { label: "Users", icon: User, href: "/dashboard/users" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
     { label: "Database", icon: Database, href: "/dashboard/database" },
     { label: "Settings", icon: Settings, href: "/dashboard/settings" },
@@ -132,7 +131,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             ))}
           </div>
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3">
               System
             </p>
@@ -143,7 +142,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 isActive={pathname === item.href}
               />
             ))}
-          </div>
+          </div> */}
         </nav>
 
         {/* Account Section */}
@@ -153,7 +152,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             onClick={() => setIsAccountOpen((open) => !open)}
             className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900 transition-colors"
           >
-            <span>Account</span>
+            <span>Account & System</span>
             <ChevronDown
               className={`h-4 w-4 transition-transform ${
                 isAccountOpen ? "rotate-180" : ""

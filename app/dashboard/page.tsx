@@ -209,16 +209,20 @@ export default function DashboardPage() {
             </div>
 
             <div className="h-[260px] min-w-0">
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <AreaChart data={overview.activity}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 12 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 12 }} allowDecimals={false} />
-                  <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "8px", color: "#fff" }} />
-                  <Area type="monotone" dataKey="users" stroke="#60a5fa" fill="#60a5fa22" strokeWidth={2} />
-                  <Area type="monotone" dataKey="events" stroke="#fbbf24" fill="#fbbf2422" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
+              {overview.activity.length ? (
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                  <AreaChart data={overview.activity}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 12 }} />
+                    <YAxis stroke="#64748b" tick={{ fontSize: 12 }} allowDecimals={false} />
+                    <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "8px", color: "#fff" }} />
+                    <Area type="monotone" dataKey="users" stroke="#60a5fa" fill="#60a5fa22" strokeWidth={2} />
+                    <Area type="monotone" dataKey="events" stroke="#fbbf24" fill="#fbbf2422" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <EmptyPanel message="No activity data returned yet." />
+              )}
             </div>
           </section>
 
