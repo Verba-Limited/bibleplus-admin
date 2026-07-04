@@ -41,6 +41,57 @@ export interface TrendingBlog {
   createdAt?: string;
 }
 
+export interface ModerationQueueCounts {
+  pendingPrayers: number;
+  flaggedPrayers: number;
+  pendingComments: number;
+  flaggedComments: number;
+  total: number;
+}
+
+export interface ModerationPrayer {
+  _id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  visibility?: string;
+  status?: string;
+  image?: string;
+  prayCount?: number;
+  isAnswered?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  [key: string]: unknown;
+}
+
+export interface ModerationComment {
+  _id: string;
+  userId?: string;
+  content?: string;
+  text?: string;
+  message?: string;
+  status?: string;
+  resourceType?: string;
+  resourceId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: unknown;
+}
+
+export interface ModerationListResponse<T> {
+  success: boolean;
+  data?: {
+    prayers?: T[];
+    comments?: T[];
+    total?: number;
+    page?: number;
+    pages?: number;
+  };
+  message?: string;
+  error?: string;
+}
+
 export interface AnalyticsTrending {
   trendingBlogs?: TrendingBlog[];
   trendingPrayers?: unknown[];
@@ -397,6 +448,76 @@ export const auditLogsApi = {
     return response.data;
   },
 };
+
+export const moderationApi = {
+  getQueueCounts: async () => {
+    const response = await axiosInstance.get<
+      ApiResponse<ModerationQueueCounts>
+    >("/admin/moderation/queue");
+    return response.data;
+  },
+
+  getPrayers: async (params?: { status?: string }) => {
+    const response = await axiosInstance.get<
+      ModerationListResponse<ModerationPrayer>
+    >("/admin/moderation/prayers", { params });
+    return response.data;
+  },
+
+  getComments: async (params?: { status?: string }) => {
+    const response = await axiosInstance.get<
+      ModerationListResponse<ModerationComment>
+    >("/admin/moderation/comments", { params });
+    return response.data;
+  },
+
+  approvePrayer: async (id: string) => {
+    const response = await axiosInstance.put<ApiResponse>(
+      `/admin/moderation/prayers/${id}/approve`,
+    );
+    return response.data;
+  },
+
+  flagPrayer: async (id: string) => {
+    const response = await axiosInstance.put<ApiResponse>(
+      `/admin/moderation/prayers/${id}/flag`,
+    );
+    return response.data;
+  },
+
+  rejectPrayer: async (id: string) => {
+    const response = await axiosInstance.delete<ApiResponse>(
+      `/admin/moderation/prayers/${id}/reject`,
+    );
+    return response.data;
+  },
+
+  // ASSUMED — verify against your backend
+  approveComment: async (id: string) => {
+    const response = await axiosInstance.put<ApiResponse>(
+      `/admin/moderation/comments/${id}/approve`,
+    );
+    return response.data;
+  },
+
+  // ASSUMED — verify against your backend
+  flagComment: async (id: string) => {
+    const response = await axiosInstance.put<ApiResponse>(
+      `/admin/moderation/comments/${id}/flag`,
+    );
+    return response.data;
+  },
+
+  // ASSUMED — verify against your backend
+  rejectComment: async (id: string) => {
+    const response = await axiosInstance.delete<ApiResponse>(
+      `/admin/moderation/comments/${id}/reject`,
+    );
+    return response.data;
+  },
+};
+
+// --- Add moderationApi to the default export object at the bottom of lib/api.ts ---
 
 // Admin analytics endpoints
 export const analyticsApi = {

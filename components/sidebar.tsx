@@ -72,9 +72,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     { label: "Settings", icon: Settings, href: "/dashboard/system-config" },
     {
-      label: "Keyboard Shortcuts",
+      label: "Moderation",
       icon: Keyboard,
-      href: "/dashboard/shortcuts",
+      href: "/dashboard/moderation",
     },
     { label: "Logs & Audits", icon: HelpCircle, href: "/dashboard/logs" },
   ];
