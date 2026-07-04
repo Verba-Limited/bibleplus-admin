@@ -231,8 +231,9 @@ export interface BibleplusNotification {
   [key: string]: unknown;
 }
 
-export interface NotificationsListResponse
-  extends ApiResponse<BibleplusNotification[]> {
+export interface NotificationsListResponse extends ApiResponse<
+  BibleplusNotification[]
+> {
   count?: number;
   total?: number;
   page?: number;
@@ -302,6 +303,33 @@ export interface AdminUsersListResponse {
   error?: string;
 }
 
+export interface AuditLog {
+  _id: string;
+  adminId: string;
+  adminUsername: string;
+  action: "CREATE" | "UPDATE" | "DELETE" | string;
+  resource: string;
+  resourceId?: string;
+  details?: string;
+  ipAddress?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  [key: string]: unknown;
+}
+
+export interface AuditLogsListResponse {
+  success: boolean;
+  data?: {
+    logs?: AuditLog[];
+    total?: number;
+    page?: number;
+    pages?: number;
+  };
+  message?: string;
+  error?: string;
+}
+
 // Admin API endpoints
 export const adminApi = {
   login: async (username: string, password: string) => {
@@ -353,6 +381,18 @@ export const dashboardApi = {
       {
         params,
       },
+    );
+    return response.data;
+  },
+};
+
+// Admin auditLogsApi enpoint
+
+export const auditLogsApi = {
+  getAll: async (params?: { page?: number; limit?: number }) => {
+    const response = await axiosInstance.get<AuditLogsListResponse>(
+      "/admin/audit-logs",
+      { params },
     );
     return response.data;
   },
@@ -769,4 +809,5 @@ export default {
   adminUsersApi,
   usersApi,
   contentApi,
+  auditLogsApi,
 };

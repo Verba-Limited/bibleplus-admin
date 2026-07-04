@@ -55,7 +55,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { label: "Users", icon: User, href: "/dashboard/users" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
     { label: "Database", icon: Database, href: "/dashboard/database" },
-    { label: "Settings", icon: Settings, href: "/dashboard/settings" },
+    {
+      label: "System Configuration",
+      icon: Settings,
+      href: "/dashboard/system-config",
+    },
     { label: "Documentation", icon: Book, href: "/dashboard/documentation" },
   ];
 
@@ -66,13 +70,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       icon: Bell,
       href: "/dashboard/notifications",
     },
-    { label: "Settings", icon: Settings, href: "/dashboard/account-settings" },
+    { label: "Settings", icon: Settings, href: "/dashboard/system-config" },
     {
       label: "Keyboard Shortcuts",
       icon: Keyboard,
       href: "/dashboard/shortcuts",
     },
-    { label: "Help & Support", icon: HelpCircle, href: "/dashboard/help" },
+    { label: "Logs & Audits", icon: HelpCircle, href: "/dashboard/logs" },
   ];
 
   return (
