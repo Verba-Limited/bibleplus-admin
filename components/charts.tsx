@@ -44,14 +44,14 @@ const contentProductionData = [
 
 const userRolesData = [
   { name: 'Admin', value: 25, color: '#a78bfa' },
-  { name: 'Editor', value: 35, color: '#60a5fa' },
+  { name: 'Editor', value: 35, color: '#fbbf24' },
   { name: 'Viewer', value: 20, color: '#34d399' },
   { name: 'Guest', value: 20, color: '#f472b6' },
 ]
 
 const pageStatusData = [
   { name: 'Published', value: 60, color: '#34d399' },
-  { name: 'Draft', value: 30, color: '#60a5fa' },
+  { name: 'Draft', value: 30, color: '#fbbf24' },
   { name: 'Review', value: 10, color: '#fbbf24' },
 ]
 
@@ -59,7 +59,7 @@ export function UserSignupsChart() {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white">User Signups</h3>
+        <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">User Signups</h3>
         <p className="text-sm text-slate-400">New user registrations over time</p>
       </div>
       <ResponsiveContainer width="100%" height={300}>
@@ -101,7 +101,7 @@ export function ContentProductionChart() {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white">Content Production</h3>
+        <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Content Production</h3>
         <p className="text-sm text-slate-400">Pages created by month and status</p>
       </div>
       <ResponsiveContainer width="100%" height={300}>
@@ -130,7 +130,7 @@ export function UserRolesPie() {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white">User Roles</h3>
+        <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">User Roles</h3>
         <p className="text-sm text-slate-400">Distribution of user roles</p>
       </div>
       <ResponsiveContainer width="100%" height={300}>
@@ -177,7 +177,7 @@ export function PageStatusPie() {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white">Page Status</h3>
+        <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Page Status</h3>
         <p className="text-sm text-slate-400">Content by status</p>
       </div>
       <ResponsiveContainer width="100%" height={300}>
@@ -224,26 +224,26 @@ export function SystemOverview() {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white">System Overview</h3>
+        <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">System Overview</h3>
       </div>
       <div className="space-y-4">
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800">
-              <span className="text-sm font-semibold text-white">📄</span>
+              <span className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">📄</span>
             </div>
             <span className="text-sm text-slate-300">Published</span>
           </div>
-          <span className="text-lg font-semibold text-white">49</span>
+          <span className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">49</span>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800">
-              <span className="text-sm font-semibold text-white">✏️</span>
+              <span className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">✏️</span>
             </div>
             <span className="text-sm text-slate-300">Active Editors</span>
           </div>
-          <span className="text-lg font-semibold text-white">15</span>
+          <span className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">15</span>
         </div>
       </div>
     </div>

@@ -124,7 +124,9 @@ export function Header({ title = "Dashboard", onMenuToggle }: HeaderProps) {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <h1 className="text-xl font-semibold text-white">{title}</h1>
+          <h1 className="text-xl font-semibold text-white font-['Source_Serif_4',serif]">
+            {title}
+          </h1>
         </div>
 
         <div className="flex items-center gap-4">

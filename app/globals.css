@@ -49,6 +49,8 @@
 }
 
 :root {
+  --app-heading-font: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --app-mono-font: "IBM Plex Mono", var(--font-geist-mono), monospace;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -126,6 +128,18 @@
   }
   html {
     @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--app-heading-font);
+    font-weight: 600;
+  }
+  code,
+  kbd,
+  pre {
+    font-family: var(--app-mono-font);
   }
 }
 

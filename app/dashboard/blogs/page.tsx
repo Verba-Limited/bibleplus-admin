@@ -333,8 +333,8 @@ export default function BlogsPage() {
       <div className="px-4 md:px-6 space-y-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">Blog operations</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">Blog operations</p>
+            <h2 className="mt-1 text-2xl font-semibold text-white font-['Source_Serif_4',serif]">
               Create, publish, and manage blogs
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
@@ -358,7 +358,7 @@ export default function BlogsPage() {
               type="button"
               onClick={loadBlogs}
               disabled={isLoading}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300 disabled:opacity-60"
             >
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -391,7 +391,7 @@ export default function BlogsPage() {
           <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                   Blog library
                 </h3>
                 <p className="text-sm text-slate-400">
@@ -405,7 +405,7 @@ export default function BlogsPage() {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search blogs"
-                  className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                  className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                 />
               </div>
             </div>
@@ -424,14 +424,14 @@ export default function BlogsPage() {
                     onClick={() => setSelectedId(blog._id)}
                     className={`overflow-hidden rounded-xl border text-left transition-colors ${
                       selectedId === blog._id
-                        ? "border-blue-500 bg-blue-500/10"
+                        ? "border-amber-400 bg-amber-400/10"
                         : "border-slate-800 bg-slate-950/60 hover:border-slate-700"
                     }`}
                   >
                     <BlogImage blog={blog} />
                     <div className="p-4">
                       <div className="mb-2 flex items-start justify-between gap-3">
-                        <h4 className="line-clamp-2 text-sm font-semibold text-white">
+                        <h4 className="line-clamp-2 text-sm font-semibold text-white font-['Source_Serif_4',serif]">
                           {blog.title}
                         </h4>
                         <StatusBadge blog={blog} />
@@ -455,7 +455,7 @@ export default function BlogsPage() {
 
           <aside className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Blog editor</h3>
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Blog editor</h3>
               <p className="text-sm text-slate-400">
                 {selectedBlog
                   ? `Selected: ${selectedBlog._id}`
@@ -472,7 +472,7 @@ export default function BlogsPage() {
                   value={selectedId}
                   onChange={(event) => setSelectedId(event.target.value)}
                   placeholder="Paste blog id, e.g. 6a33e..."
-                  className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                  className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                 />
                 <span className="mt-2 block text-xs text-slate-500">
                   Create does not need an ID. Update, publish, and delete use
@@ -493,7 +493,7 @@ export default function BlogsPage() {
                     }))
                   }
                   placeholder="Book for New Moms..."
-                  className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                  className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                 />
               </label>
 
@@ -511,7 +511,7 @@ export default function BlogsPage() {
                   }
                   placeholder="Write or paste the blog content..."
                   rows={8}
-                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm leading-6 text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm leading-6 text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                 />
               </label>
 
@@ -544,7 +544,7 @@ export default function BlogsPage() {
                   disabled={
                     isSaving || !form.title.trim() || !form.content.trim()
                   }
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300 disabled:opacity-60"
                 >
                   {isSaving ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -659,7 +659,7 @@ function StatCard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-slate-400">{label}</p>
-          <p className="mt-2 text-3xl font-bold text-white">{value}</p>
+          <p className="mt-2 text-3xl font-semibold text-white font-['Source_Serif_4',serif]">{value}</p>
         </div>
         <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-slate-300">
           <Icon className="h-5 w-5" />

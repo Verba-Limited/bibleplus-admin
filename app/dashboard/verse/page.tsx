@@ -112,8 +112,8 @@ export default function VerseOfDayPage() {
       <div className="space-y-6 px-4 md:px-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">Daily verse</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">Daily verse</p>
+            <h2 className="mt-1 text-2xl font-semibold text-white font-['Source_Serif_4',serif]">
               Set verse of the day
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
@@ -146,7 +146,7 @@ export default function VerseOfDayPage() {
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                   Verse details
                 </h3>
                 <p className="text-sm text-slate-400">
@@ -156,7 +156,7 @@ export default function VerseOfDayPage() {
               <button
                 type="submit"
                 disabled={isSaving || !canSubmit}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300 disabled:opacity-60"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -244,7 +244,7 @@ export default function VerseOfDayPage() {
                     }))
                   }
                   rows={6}
-                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                 />
               </label>
             </div>
@@ -253,13 +253,13 @@ export default function VerseOfDayPage() {
           <aside className="space-y-6">
             <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
               <div className="mb-5">
-                <h3 className="text-lg font-semibold text-white">Preview</h3>
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Preview</h3>
                 <p className="text-sm text-slate-400">
                   This is the payload that will be saved.
                 </p>
               </div>
               <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
-                <p className="text-xs font-semibold uppercase tracking-wider text-blue-300">
+                <p className="text-xs font-semibold uppercase tracking-wider text-amber-400">
                   {preview.date}
                 </p>
                 <blockquote className="mt-4 text-lg font-semibold leading-7 text-white">
@@ -276,7 +276,7 @@ export default function VerseOfDayPage() {
             </section>
 
             <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 Last saved response
               </h3>
               {savedVerse ? (
@@ -336,7 +336,7 @@ function TextField({
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
-          className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+          className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
         />
       </div>
     </label>

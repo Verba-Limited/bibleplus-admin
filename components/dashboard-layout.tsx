@@ -33,7 +33,7 @@ export function DashboardLayout({
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950">
         <div className="text-center">
-          <div className="mb-4 h-12 w-12 rounded-full border-4 border-slate-700 border-t-purple-500 animate-spin mx-auto"></div>
+          <div className="mb-4 h-12 w-12 rounded-full border-4 border-slate-700 border-t-amber-400 animate-spin mx-auto"></div>
           <p className="text-slate-400">Loading...</p>
         </div>
       </div>

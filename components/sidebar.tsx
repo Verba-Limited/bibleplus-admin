@@ -97,12 +97,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <X className="h-4 w-4" />
           </button>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br to-blue-500">
-              <span className="text-sm font-bold text-white">B</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-400">
+              <span className="text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif]">
+                B
+              </span>
             </div>
             <div>
-              <div className="text-sm font-bold text-white">Bibleplus</div>
-              <div className="text-xs text-slate-500">Admin Dashboard</div>
+              <div className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">
+                Bibleplus
+              </div>
+              <div className="text-xs text-slate-500 font-['IBM_Plex_Mono',monospace]">
+                Admin Dashboard
+              </div>
             </div>
           </Link>
         </div>
@@ -110,7 +116,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 no-scrollbar overflow-y-auto px-2">
           <div className="mb-6">
-            <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3">
+            <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3 font-['IBM_Plex_Mono',monospace]">
               Overview
             </p>
             {menuItems.slice(0, 1).map((item) => (
@@ -123,7 +129,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           <div className="mb-6">
-            <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3">
+            <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3 font-['IBM_Plex_Mono',monospace]">
               Management
             </p>
             {menuItems.slice(1, 8).map((item) => (
@@ -186,7 +192,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </button>
 
           <div className="mt-4 flex items-center gap-2 rounded-lg bg-slate-900 p-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 text-xs font-bold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-400 text-xs font-semibold text-slate-950 font-['Source_Serif_4',serif]">
               DU
             </div>
             <div className="flex-1 min-w-0">

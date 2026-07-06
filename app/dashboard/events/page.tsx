@@ -514,10 +514,10 @@ export default function EventsPage() {
       <div className="px-4 md:px-6 space-y-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">
               Event operations
             </p>
-            <h2 className="mt-1 text-2xl font-bold text-white">
+            <h2 className="mt-1 text-2xl font-semibold text-white font-['Source_Serif_4',serif]">
               Manage BiblePlus events
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
@@ -536,10 +536,10 @@ export default function EventsPage() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search events"
-                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
               />
             </div>
-            <button className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-blue-500">
+            <button className="inline-flex h-10 items-center justify-center rounded-lg bg-amber-400 px-4 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300">
               Search
             </button>
           </form>
@@ -553,7 +553,7 @@ export default function EventsPage() {
               onClick={() => handleViewChange(view.id)}
               className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
                 activeView === view.id
-                  ? "bg-blue-600 text-white"
+                  ? "bg-amber-400 text-slate-950"
                   : "border border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700"
               }`}
             >
@@ -581,7 +581,7 @@ export default function EventsPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-2">
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 Upload banner
               </h3>
               {/* <p className="text-sm text-slate-400">
@@ -601,7 +601,7 @@ export default function EventsPage() {
                 type="button"
                 onClick={handleUploadBanner}
                 disabled={!bannerFile || isUploadingBanner}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300 disabled:opacity-60"
               >
                 {isUploadingBanner ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -627,7 +627,7 @@ export default function EventsPage() {
 
           {/* <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 Create event category
               </h3>
               <p className="text-sm text-slate-400">
@@ -658,7 +658,7 @@ export default function EventsPage() {
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 Create speaker
               </h3>
               {/* <p className="text-sm text-slate-400">
@@ -688,7 +688,7 @@ export default function EventsPage() {
                   }
                   rows={3}
                   placeholder="Speaker Bio"
-                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                 />
               </label>
               <button
@@ -709,7 +709,7 @@ export default function EventsPage() {
 
         <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
           <div className="mb-5">
-            <h3 className="text-lg font-semibold text-white">Create event</h3>
+            <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Create event</h3>
             {/* <p className="text-sm text-slate-400">
               POST /api/admin/events. Add livestream URL inside liveStream.url.
             </p> */}
@@ -775,7 +775,7 @@ export default function EventsPage() {
                     frequency: event.target.value,
                   }))
                 }
-                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors focus:border-blue-500"
+                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors focus:border-amber-400"
               >
                 <option value="Once">Once</option>
                 <option value="Daily">Daily</option>
@@ -797,14 +797,14 @@ export default function EventsPage() {
                   }))
                 }
                 rows={4}
-                className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
               />
             </label>
 
             <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 lg:col-span-2">
               <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-white">Livestream</p>
+                  <p className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">Livestream</p>
                   <p className="text-xs text-slate-400">
                     These become liveStream.platform, liveStream.url, and
                     liveStream.thumbnail.
@@ -866,7 +866,7 @@ export default function EventsPage() {
             <button
               type="submit"
               disabled={isSaving || !canCreateEvent}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60 lg:col-span-2"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300 disabled:opacity-60 lg:col-span-2"
             >
               {isSaving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -882,7 +882,7 @@ export default function EventsPage() {
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">Events</h3>
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Events</h3>
                 <p className="text-sm text-slate-400">
                   {events.length} records loaded
                 </p>
@@ -906,12 +906,12 @@ export default function EventsPage() {
                     onClick={() => setSelectedId(event._id)}
                     className={`rounded-xl border p-4 text-left transition-colors ${
                       selectedId === event._id
-                        ? "border-blue-500 bg-blue-500/10"
+                        ? "border-amber-400 bg-amber-400/10"
                         : "border-slate-800 bg-slate-950/60 hover:border-slate-700"
                     }`}
                   >
                     <div className="mb-3 flex items-start justify-between gap-3">
-                      <h4 className="line-clamp-2 text-sm font-semibold text-white">
+                      <h4 className="line-clamp-2 text-sm font-semibold text-white font-['Source_Serif_4',serif]">
                         {getEventTitle(event)}
                       </h4>
                       <span className="shrink-0 rounded-full bg-slate-800 px-2 py-1 text-xs font-semibold capitalize text-slate-300">
@@ -944,7 +944,7 @@ export default function EventsPage() {
 
           <aside className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 Selected event
               </h3>
               <p className="text-sm text-slate-400">
@@ -1008,14 +1008,14 @@ export default function EventsPage() {
                   }
                   disabled={!selectedEvent}
                   rows={5}
-                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+                  className="w-full resize-none rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400 disabled:opacity-60"
                 />
               </label>
 
               <button
                 type="submit"
                 disabled={!selectedEvent || isSaving}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300 disabled:opacity-60"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -1138,7 +1138,7 @@ function TextField({
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
-        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400 disabled:opacity-60"
       />
     </label>
   );
@@ -1170,7 +1170,7 @@ function DateField({
         disabled={disabled}
         dateFormat="MMM d, yyyy"
         placeholderText="Pick a date"
-        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400 disabled:opacity-60"
         calendarClassName="!bg-slate-900 !border-slate-700 !text-white"
         wrapperClassName="w-full"
       />
@@ -1212,7 +1212,7 @@ function DateTimeField({
         timeIntervals={15}
         dateFormat="MMM d, yyyy h:mm aa"
         placeholderText="Pick a date & time"
-        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500 disabled:opacity-60"
+        className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400 disabled:opacity-60"
         calendarClassName="!bg-slate-900 !border-slate-700 !text-white"
         wrapperClassName="w-full"
       />

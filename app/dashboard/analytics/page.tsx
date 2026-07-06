@@ -162,8 +162,8 @@ export default function AnalyticsPage() {
       <div className="px-4 md:px-6 space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">Admin analytics</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">Admin analytics</p>
+            <h2 className="mt-1 text-2xl font-semibold text-white font-['Source_Serif_4',serif]">
               BiblePlus performance
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
@@ -240,7 +240,7 @@ export default function AnalyticsPage() {
           <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                   Daily activity
                 </h3>
                 <p className="text-sm text-slate-400">
@@ -251,7 +251,7 @@ export default function AnalyticsPage() {
                 <ActivityPill
                   label="Users"
                   value={totalActivity.users}
-                  color="bg-blue-400"
+                  color="bg-amber-400"
                 />
                 <ActivityPill
                   label="Blogs"
@@ -284,10 +284,10 @@ export default function AnalyticsPage() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="#60a5fa"
+                        stopColor="#fbbf24"
                         stopOpacity={0.35}
                       />
-                      <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
+                      <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -312,7 +312,7 @@ export default function AnalyticsPage() {
                   <Area
                     type="monotone"
                     dataKey="users"
-                    stroke="#60a5fa"
+                    stroke="#fbbf24"
                     fill="url(#activityUsers)"
                     strokeWidth={2}
                   />
@@ -344,7 +344,7 @@ export default function AnalyticsPage() {
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 System health
               </h3>
               <p className="text-sm text-slate-400">
@@ -359,7 +359,7 @@ export default function AnalyticsPage() {
                     <Database className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-white">MongoDB</p>
+                    <p className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">MongoDB</p>
                     <p className="text-xs text-slate-400">Connection status</p>
                   </div>
                 </div>
@@ -371,23 +371,23 @@ export default function AnalyticsPage() {
               <div className="rounded-lg bg-slate-950/70 p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-400/10 text-amber-400">
                       <Server className="h-5 w-5" />
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-white">Memory</p>
+                      <p className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">Memory</p>
                       <p className="text-xs text-slate-400">
                         {formatBytes(memoryUsed)} of {formatBytes(memoryTotal)}
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">
                     {memoryPercent}%
                   </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-slate-800">
                   <div
-                    className="h-full rounded-full bg-blue-400"
+                    className="h-full rounded-full bg-amber-400"
                     style={{ width: `${memoryPercent}%` }}
                   />
                 </div>
@@ -418,7 +418,7 @@ export default function AnalyticsPage() {
         <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-[minmax(340px,0.9fr)_minmax(0,1.3fr)]">
           <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 Trending blogs
               </h3>
               <p className="text-sm text-slate-400">
@@ -434,7 +434,7 @@ export default function AnalyticsPage() {
                     className="rounded-lg border border-slate-800 bg-slate-950/60 p-4"
                   >
                     <div className="mb-2 flex items-start justify-between gap-3">
-                      <h4 className="line-clamp-2 text-sm font-semibold text-white">
+                      <h4 className="line-clamp-2 text-sm font-semibold text-white font-['Source_Serif_4',serif]">
                         {blog.title}
                       </h4>
                       <span className="rounded-full bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-300">
@@ -456,7 +456,7 @@ export default function AnalyticsPage() {
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5">
-              <h3 className="text-lg font-semibold text-white">Content mix</h3>
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Content mix</h3>
               <p className="text-sm text-slate-400">
                 High-level distribution from the overview endpoint.
               </p>
@@ -537,7 +537,7 @@ function MetricCard({
         <div>
           <p className="text-sm text-slate-400">{label}</p>
           <p
-            className={`${compact ? "mt-1 text-2xl" : "mt-2 text-3xl"} font-bold text-white`}
+            className={`${compact ? "mt-1 text-2xl" : "mt-2 text-3xl"} font-semibold text-white font-['Source_Serif_4',serif]`}
           >
             {value}
           </p>
@@ -574,7 +574,7 @@ function MiniStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
       <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-white">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-white font-['Source_Serif_4',serif]">{value}</p>
     </div>
   );
 }

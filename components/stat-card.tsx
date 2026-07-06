@@ -23,7 +23,7 @@ export function StatCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm text-slate-400 mb-2">{title}</p>
-          <p className="text-3xl font-bold text-white">{value}</p>
+          <p className="text-3xl font-semibold text-white font-['Source_Serif_4',serif]">{value}</p>
           {subtitle && (
             <div className="mt-2 flex items-center gap-1">
               {trend?.direction === 'down' ? (

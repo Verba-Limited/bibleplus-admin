@@ -154,8 +154,8 @@ export default function DashboardPage() {
       <div className="px-4 md:px-6 space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">Overview</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">Today at a glance</h2>
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">Overview</p>
+            <h2 className="mt-1 text-2xl font-semibold text-white font-['Source_Serif_4',serif]">Today at a glance</h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
               The quickest read on BiblePlus health, content, activity, and what needs your attention.
             </p>
@@ -189,12 +189,12 @@ export default function DashboardPage() {
           <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">Recent activity</h3>
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Recent activity</h3>
                 <p className="text-sm text-slate-400">A compact preview of the activity endpoint.</p>
               </div>
               <Link
                 href="/dashboard/analytics"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-blue-300 hover:text-blue-200"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300"
               >
                 View analytics
                 <ArrowRight className="h-4 w-4" />
@@ -216,7 +216,7 @@ export default function DashboardPage() {
                     <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 12 }} />
                     <YAxis stroke="#64748b" tick={{ fontSize: 12 }} allowDecimals={false} />
                     <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "8px", color: "#fff" }} />
-                    <Area type="monotone" dataKey="users" stroke="#60a5fa" fill="#60a5fa22" strokeWidth={2} />
+                    <Area type="monotone" dataKey="users" stroke="#fbbf24" fill="#fbbf2422" strokeWidth={2} />
                     <Area type="monotone" dataKey="events" stroke="#fbbf24" fill="#fbbf2422" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -227,7 +227,7 @@ export default function DashboardPage() {
           </section>
 
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
-            <h3 className="text-lg font-semibold text-white">Attention</h3>
+            <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Attention</h3>
             <p className="mt-1 text-sm text-slate-400">Fast operational signals.</p>
 
             <div className="mt-5 space-y-3">
@@ -264,10 +264,10 @@ export default function DashboardPage() {
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">Upcoming events</h3>
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Upcoming events</h3>
                 <p className="text-sm text-slate-400">Next events from the events API.</p>
               </div>
-              <Link href="/dashboard/events" className="text-sm font-semibold text-blue-300 hover:text-blue-200">
+              <Link href="/dashboard/events" className="text-sm font-semibold text-amber-400 hover:text-amber-300">
                 Manage
               </Link>
             </div>
@@ -288,10 +288,10 @@ export default function DashboardPage() {
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">Trending blogs</h3>
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Trending blogs</h3>
                 <p className="text-sm text-slate-400">A quick preview from trending analytics.</p>
               </div>
-              <Link href="/dashboard/analytics" className="text-sm font-semibold text-blue-300 hover:text-blue-200">
+              <Link href="/dashboard/analytics" className="text-sm font-semibold text-amber-400 hover:text-amber-300">
                 Details
               </Link>
             </div>
@@ -335,7 +335,7 @@ function MetricCard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-slate-400">{label}</p>
-          <p className="mt-2 text-3xl font-bold text-white">{value}</p>
+          <p className="mt-2 text-3xl font-semibold text-white font-['Source_Serif_4',serif]">{value}</p>
         </div>
         <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-slate-300">
           <Icon className="h-5 w-5" />
@@ -349,7 +349,7 @@ function SmallStat({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-lg bg-slate-950/70 px-3 py-2">
       <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-white">{formatNumber(value)}</p>
+      <p className="mt-1 text-lg font-semibold text-white font-['Source_Serif_4',serif]">{formatNumber(value)}</p>
     </div>
   );
 }
@@ -370,7 +370,7 @@ function AttentionItem({
       ? "bg-emerald-500/10 text-emerald-300"
       : tone === "warn"
         ? "bg-amber-500/10 text-amber-300"
-        : "bg-blue-500/10 text-blue-300";
+        : "bg-amber-400/10 text-amber-400";
 
   return (
     <div className="flex items-center gap-3 rounded-lg bg-slate-950/70 p-4">
@@ -378,7 +378,7 @@ function AttentionItem({
         {tone === "good" ? <CheckCircle2 className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
       </span>
       <div>
-        <p className="text-sm font-semibold text-white">{title}</p>
+        <p className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">{title}</p>
         <p className="text-xs text-slate-400">{value}</p>
       </div>
     </div>
@@ -389,7 +389,7 @@ function QuickLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-200 transition-colors hover:border-blue-500 hover:text-white"
+      className="inline-flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-200 transition-colors hover:border-amber-400 hover:text-white"
     >
       {label}
       <ArrowRight className="h-4 w-4" />

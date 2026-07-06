@@ -268,8 +268,8 @@ export default function UsersManagementPage() {
       <div className="space-y-6 px-4 md:px-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-300">User operations</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">Manage users</h2>
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber-400 font-['IBM_Plex_Mono',monospace]">User operations</p>
+            <h2 className="mt-1 text-2xl font-semibold text-white font-['Source_Serif_4',serif]">Manage users</h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-400">
               Review accounts, load a user profile, reset passwords, and remove
               users from the admin API.
@@ -283,7 +283,7 @@ export default function UsersManagementPage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search loaded users"
-                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
               />
             </div>
             <button
@@ -323,7 +323,7 @@ export default function UsersManagementPage() {
           <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-lg font-semibold text-white">Users</h3>
+                <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Users</h3>
                 <p className="text-sm text-slate-400">
                   {filteredUsers.length} of {users.length} loaded records shown
                 </p>
@@ -347,14 +347,14 @@ export default function UsersManagementPage() {
                     onClick={() => setSelectedId(user._id)}
                     className={`w-full rounded-xl border p-4 text-left transition-colors ${
                       selectedId === user._id
-                        ? "border-blue-500 bg-blue-500/10"
+                        ? "border-amber-400 bg-amber-400/10"
                         : "border-slate-800 bg-slate-950/60 hover:border-slate-700"
                     }`}
                   >
                     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="text-sm font-semibold text-white">
+                          <h4 className="text-sm font-semibold text-white font-['Source_Serif_4',serif]">
                             {getUserName(user)}
                           </h4>
                           <Tag>{user.role || "user"}</Tag>
@@ -420,7 +420,7 @@ export default function UsersManagementPage() {
             <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                     Selected user
                   </h3>
                   <p className="text-sm text-slate-400">
@@ -477,7 +477,7 @@ export default function UsersManagementPage() {
             </section>
 
             <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">
                 Reset password
               </h3>
               <p className="mt-1 text-sm text-slate-400">
@@ -495,14 +495,14 @@ export default function UsersManagementPage() {
                       value={newPassword}
                       onChange={(event) => setNewPassword(event.target.value)}
                       placeholder="Optional"
-                      className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-blue-500"
+                      className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-amber-400"
                     />
                   </div>
                 </label>
                 <button
                   type="submit"
                   disabled={!selectedId || isSaving}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-60"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-950 font-['Source_Serif_4',serif] transition-colors hover:bg-amber-300 disabled:opacity-60"
                 >
                   {isSaving ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -515,7 +515,7 @@ export default function UsersManagementPage() {
             </section>
 
             <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 backdrop-blur-sm">
-              <h3 className="text-lg font-semibold text-white">Danger zone</h3>
+              <h3 className="text-lg font-semibold text-white font-['Source_Serif_4',serif]">Danger zone</h3>
               <button
                 type="button"
                 onClick={() => setIsDeletePending(true)}
@@ -558,7 +558,7 @@ function StatCard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-slate-400">{label}</p>
-          <p className="mt-2 text-3xl font-bold text-white">{value}</p>
+          <p className="mt-2 text-3xl font-semibold text-white font-['Source_Serif_4',serif]">{value}</p>
         </div>
         <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-slate-300">
           <Icon className="h-5 w-5" />
