@@ -354,6 +354,24 @@ export interface AdminUsersListResponse {
   error?: string;
 }
 
+export interface AdminManagementUser {
+  _id: string;
+  username: string;
+  email?: string;
+  role: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  [key: string]: unknown;
+}
+
+export interface AdminManagementPayload {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
 export interface AuditLog {
   _id: string;
   adminId: string;
@@ -380,6 +398,8 @@ export interface AuditLogsListResponse {
   message?: string;
   error?: string;
 }
+
+export type ExportKind = "users" | "prayers";
 
 // Admin API endpoints
 export const adminApi = {
@@ -445,6 +465,22 @@ export const auditLogsApi = {
       "/admin/audit-logs",
       { params },
     );
+    return response.data;
+  },
+};
+
+export const exportsApi = {
+  getUsers: async () => {
+    const response = await axiosInstance.get<string>("/admin/exports/users", {
+      responseType: "text",
+    });
+    return response.data;
+  },
+
+  getPrayers: async () => {
+    const response = await axiosInstance.get<string>("/admin/exports/prayers", {
+      responseType: "text",
+    });
     return response.data;
   },
 };
@@ -790,6 +826,30 @@ export const adminUsersApi = {
   },
 };
 
+export const adminManagementApi = {
+  getAll: async () => {
+    const response = await axiosInstance.get<ApiResponse<AdminManagementUser[]>>(
+      "/admin/management",
+    );
+    return response.data;
+  },
+
+  create: async (data: AdminManagementPayload) => {
+    const response = await axiosInstance.post<ApiResponse<AdminManagementUser>>(
+      "/admin/management",
+      data,
+    );
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await axiosInstance.delete<ApiResponse>(
+      `/admin/management/${id}`,
+    );
+    return response.data;
+  },
+};
+
 // Quiz endpoints
 export const quizApi = {
   createBulk: async (questions: QuizQuestionPayload[]) => {
@@ -931,4 +991,6 @@ export default {
   usersApi,
   contentApi,
   auditLogsApi,
+  exportsApi,
+  adminManagementApi,
 };

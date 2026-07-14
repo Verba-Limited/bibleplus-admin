@@ -14,8 +14,10 @@ import {
   Book,
   BookOpen,
   CalendarDays,
+  FileDown,
   LogOut,
   User,
+  UserCog,
   Keyboard,
   HelpCircle,
   ChevronDown,
@@ -53,6 +55,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { label: "Books", icon: BookOpen, href: "/dashboard/books" },
     { label: "Verse", icon: BookOpen, href: "/dashboard/verse" },
     { label: "Users", icon: User, href: "/dashboard/users" },
+    {
+      label: "Admin Management",
+      icon: UserCog,
+      href: "/dashboard/admin-management",
+    },
+    { label: "Exports", icon: FileDown, href: "/dashboard/exports" },
     { label: "Notifications", icon: Bell, href: "/dashboard/notifications" },
     { label: "Database", icon: Database, href: "/dashboard/database" },
     {
@@ -132,7 +140,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3 font-['IBM_Plex_Mono',monospace]">
               Management
             </p>
-            {menuItems.slice(1, 8).map((item) => (
+            {menuItems.slice(1, 10).map((item) => (
               <SidebarLink
                 key={item.href}
                 item={item}

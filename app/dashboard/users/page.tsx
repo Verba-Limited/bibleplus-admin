@@ -12,7 +12,6 @@ import {
   Loader2,
   LockKeyhole,
   Mail,
-  MapPin,
   RefreshCw,
   Search,
   ShieldCheck,
@@ -60,30 +59,29 @@ function formatDate(value?: string) {
   }).format(date);
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object";
+}
+
 function isAdminUserRecord(value: unknown): value is AdminUserRecord {
   return (
-    value !== null &&
-    typeof value === "object" &&
-    "_id" in value &&
-    typeof (value as any)._id === "string" &&
-    "email" in value &&
-    typeof (value as any).email === "string"
+    isRecord(value) &&
+    typeof value._id === "string" &&
+    typeof value.email === "string"
   );
 }
 
 function getDetailUser(value: unknown): AdminUserRecord | null {
-  if (!value || typeof value !== "object") return null;
+  if (!isRecord(value)) return null;
 
-  const response = value as { data?: unknown };
-  const data = response.data;
-  if (!data || typeof data !== "object") return null;
+  const data = value.data;
+  if (!isRecord(data)) return null;
 
-  if ("user" in data) {
-    const user = (data as { user?: unknown }).user;
-    return isAdminUserRecord(user) ? user : null;
-  }
-
-  return isAdminUserRecord(data) ? data : null;
+  return isAdminUserRecord(data.user)
+    ? data.user
+    : isAdminUserRecord(data)
+      ? data
+      : null;
 }
 
 export default function UsersManagementPage() {
