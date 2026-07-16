@@ -69,6 +69,19 @@ function stripHtml(value?: string) {
     .trim();
 }
 
+function getBlogContent(blog?: BibleplusBlog | null) {
+  if (!blog) return "";
+
+  return (
+    blog.content ||
+    (typeof blog.body === "string" ? blog.body : "") ||
+    (typeof blog.description === "string" ? blog.description : "") ||
+    blog.summary ||
+    blog.excerpt ||
+    ""
+  );
+}
+
 function blogIsPublished(blog?: BibleplusBlog | null) {
   return Boolean(
     blog?.published || blog?.isPublished || blog?.status === "published",
@@ -114,7 +127,7 @@ export default function BlogsPage() {
     if (!query) return blogs;
 
     return blogs.filter((blog) =>
-      [blog.title, blog.slug, stripHtml(blog.content)]
+      [blog.title, blog.slug, stripHtml(getBlogContent(blog))]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query)),
     );
@@ -162,7 +175,7 @@ export default function BlogsPage() {
     setForm((current) => ({
       ...current,
       title: selectedBlog.title || "",
-      content: selectedBlog.content || "",
+      content: getBlogContent(selectedBlog),
       coverImage: null,
     }));
   }, [selectedBlog]);
@@ -437,7 +450,7 @@ export default function BlogsPage() {
                         <StatusBadge blog={blog} />
                       </div>
                       <p className="line-clamp-3 text-xs leading-5 text-slate-400">
-                        {stripHtml(blog.content) ||
+                        {stripHtml(getBlogContent(blog)) ||
                           blog.slug ||
                           "No summary available."}
                       </p>

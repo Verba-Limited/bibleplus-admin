@@ -251,7 +251,7 @@ function ExportPanel({
             <p className="text-sm text-slate-400">{config.description}</p>
           </div>
         </div>
-        <span className="rounded-full border border-amber-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400 font-['IBM_Plex_Mono',monospace]">
+        <span className="flex rounded-full border border-amber-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-400 font-['IBM_Plex_Mono',monospace]">
           {rowCount} rows
         </span>
       </div>

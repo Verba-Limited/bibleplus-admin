@@ -282,6 +282,34 @@ export interface BibleplusNotification {
   [key: string]: unknown;
 }
 
+export interface BibleplusPrayer {
+  _id: string;
+  user?: {
+    _id?: string;
+    email?: string;
+    username?: string;
+  };
+  userId?: string;
+  title?: string;
+  description?: string;
+  visibility?: string;
+  status?: string;
+  isAnswered?: boolean;
+  image?: string;
+  prayCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  [key: string]: unknown;
+}
+
+export interface PrayersListResponse extends ApiResponse<
+  BibleplusPrayer[] | { prayers?: BibleplusPrayer[] }
+> {
+  count?: number;
+  total?: number;
+}
+
 export interface NotificationsListResponse extends ApiResponse<
   BibleplusNotification[]
 > {
@@ -893,6 +921,22 @@ export const booksApi = {
   },
 };
 
+// Prayers endpoints
+export const prayersApi = {
+  getMine: async () => {
+    const response =
+      await axiosInstance.get<PrayersListResponse>("/prayer/mine");
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await axiosInstance.delete<ApiResponse>(
+      `/admin/prayers/${id}`,
+    );
+    return response.data;
+  },
+};
+
 // Notifications endpoints
 export const notificationsApi = {
   getAll: async (params?: any) => {
@@ -993,4 +1037,5 @@ export default {
   auditLogsApi,
   exportsApi,
   adminManagementApi,
+  prayersApi,
 };

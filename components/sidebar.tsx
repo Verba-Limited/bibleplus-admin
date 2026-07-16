@@ -15,6 +15,7 @@ import {
   BookOpen,
   CalendarDays,
   FileDown,
+  Heart,
   LogOut,
   User,
   UserCog,
@@ -54,6 +55,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { label: "Quiz", icon: HelpCircle, href: "/dashboard/quiz" },
     { label: "Books", icon: BookOpen, href: "/dashboard/books" },
     { label: "Verse", icon: BookOpen, href: "/dashboard/verse" },
+    { label: "Prayers", icon: Heart, href: "/dashboard/prayers" },
     { label: "Users", icon: User, href: "/dashboard/users" },
     {
       label: "Admin Management",
@@ -72,7 +74,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   ];
 
   const accountItems = [
-    { label: "Profile", icon: User, href: "/dashboard/profile" },
+    // { label: "Profile", icon: User, href: "/dashboard/profile" },
     {
       label: "Notifications",
       icon: Bell,
@@ -140,7 +142,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <p className="px-3 text-xs font-semibold uppercase text-slate-500 mb-3 font-['IBM_Plex_Mono',monospace]">
               Management
             </p>
-            {menuItems.slice(1, 10).map((item) => (
+            {menuItems.slice(1, 11).map((item) => (
               <SidebarLink
                 key={item.href}
                 item={item}
